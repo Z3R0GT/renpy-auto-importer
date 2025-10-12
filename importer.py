@@ -9,18 +9,19 @@
 import sys
 import logging
 import warnings
-from os import listdir, path, chdir
+from os import listdir, chdir, getcwd, remove
 
 ########################################################
 #
 # Meta zone
 #
 ########################################################
-__version__ = "1.0.4.6-dev"
-__return__ = 0
-__product__ = "importer"
-__author__ = "Z3R0_GT"
-__is_main__ = __name__ == "__main__"
+__version__  = "1.0.4.6-dev"
+__return__   = 0
+__product__  = "importer"
+__author__   = "Z3R0_GT"
+__is_main__  = __name__ == "__main__"
+__can_edit__ = True
 ########################################################
 #
 # Logger zone
@@ -40,7 +41,7 @@ if __name__ == "__main__":
 if sys.version_info >= (3, 15):
     __return__ = 2
     logger.fatal(
-        "The python version used is actually unsupported and shouldn't be used due some problems"
+        "The python version used is actually unsupported and shouldn't use it due some problems we have at the moment"
     )
     if __is_main__:
         raise Exception(
@@ -49,7 +50,7 @@ if sys.version_info >= (3, 15):
 
 from enum import IntEnum, StrEnum
 
-# We ignore 'locale.getdefaultlocale' watning
+# We ignore 'locale.getdefaultlocale' warning
 warnings.filterwarnings("ignore", ".*is deprecated and slated for removal in.*")
 try:
     from locale import getdefaultlocale
@@ -63,7 +64,6 @@ from shutil import rmtree
 
 
 from functools import singledispatch
-from types import FunctionType
 
 from pathlib import Path
 from subprocess import run
@@ -117,10 +117,32 @@ class MessagesError(StrEnum):
     FEAUTRE_NOT_FOUND = "FEAUTRE_NOT_FOUND"
     FILE_NOT_FOUND = "FILE_NOT_FOUND"
     USING_BUILT_IN = "USING_BUILT_IN"
+    FEATURE_NOT_SUPPORTED = "FEATURE_NOT_SUPPORTED"
+    ARGUMENT_NOT_FOUND = "ARGUMENT_NOT_FOUND"
+    EXTENSION_ERROR = "EXTENSION_ERROR"
 
 
 class MessagesMeta(StrEnum):
-    DESCRIPTION = "DESCRIPTION"
+    DESCRIPTION = "DESCRIPTION",
+    MESSAGE_INFO = "MESSAGE_INFO"
+    MESSAGE_FUNCTION_INIT = "MESSAGE_FUNCTION_INIT"
+    MESSAGE_FUNCTION_PROGRESS = "MESSAGE_FUNCTION_PROGRESS"
+    MESSAGE_FUNCTION_ENDED = "MESSAGE_FUNCTION_ENDED"
+
+
+class TemplateKeys(StrEnum):
+    NORMAL = "normal"
+    SCALE  = "scale"
+    FLIPED = "fliped"
+    SIDE   = "side"
+    SOUND  = "sound"
+    VIDEO  = "video"
+    ZIPLOAD= "zip_load"
+
+class TemplatePath(StrEnum):
+    NORMAL  = "normal"
+    ENCRYPT = "encrypt"
+    ZIP     = "zip"
 
 ########################################################
 #
@@ -150,12 +172,19 @@ def has_feature(what: FeaturesKeywords) -> bool:
 logger.info("Starting language service")
 languages: dict[str, dict[str, str]] = {
     "en": {
-        MessagesError.MODULE_NOT_FOUND: "There's not '{name}' installed",
         MessagesError.MODULE_NOT_FOUND_USING_DEFAULT: "There's not '{name}' installed, using default",
-        MessagesError.FEAUTRE_NOT_FOUND: "The {name} feature couldn't be found",
-        MessagesError.FILE_NOT_FOUND: "The {file} file couldn't be found",
-        MessagesError.USING_BUILT_IN: "Using {name} built-in instead",
-        MessagesMeta.DESCRIPTION: "This is a simple tool easy-to-use to import assets and stuff from normal files to common.rpy files"
+        MessagesError.MODULE_NOT_FOUND     : "There's not '{name}' installed",
+        MessagesError.FEAUTRE_NOT_FOUND    : "The {name} feature couldn't be found",
+        MessagesError.ARGUMENT_NOT_FOUND   : "The {name} argument couldn't be found",
+        MessagesError.FILE_NOT_FOUND       : "The {file} file couldn't be found",
+        MessagesError.USING_BUILT_IN       : "Using {name} built-in instead",
+        MessagesMeta.DESCRIPTION           : "This is a simple tool easy-to-use to import assets and stuff from normal files to common.rpy files",
+        MessagesError.FEATURE_NOT_SUPPORTED: "The feature '{name}' is not supported due to {reason}",
+        MessagesMeta.MESSAGE_INFO          : "Given '{name}' was made the operation '{operation}' with result '{result}'",
+        MessagesMeta.MESSAGE_FUNCTION_INIT : "The operation '{name}' was started",
+        MessagesMeta.MESSAGE_FUNCTION_PROGRESS: "Resolving '{name}' operation",
+        MessagesMeta.MESSAGE_FUNCTION_ENDED: "The operation '{name}' was ended with '{result}' as result",
+        MessagesError.EXTENSION_ERROR      : "There are some files that might need change its extension or be compressed:"
     }
 }
 logger.info("Built-in languages: " + str(list(languages.keys())))
@@ -166,7 +195,7 @@ logger.info("Selected language: " + language)
 logger.info("Language service ended")
 
 
-def get_message_translated(name: str) -> str:
+def get_message_translated(name: str, /,**kwargs: dict[str, str]) -> str:
     if not name in languages[language]:
         logger.debug(
             "The key '{}' couldn't be found base in the language {}".format(
@@ -174,9 +203,11 @@ def get_message_translated(name: str) -> str:
             )
         )
         return ""
-
-    return languages[language][name]
-
+    try:
+        return languages[language][name].format(**kwargs) if len(kwargs) != 0 else languages[language][name]
+    except KeyError:
+        print(get_message_translated(MessagesMeta.MESSAGE_INFO, name=name, operation="get_message_translated", result="key not found"))
+        return "Unkown error"
 
 ########################################################
 #
@@ -189,6 +220,7 @@ try:
         Sequence,
         overload,
         Literal,
+        Callable,
         Any,
     )
 except ModuleNotFoundError:
@@ -291,6 +323,7 @@ RESERVED_GENERIC_FILE_NAMES: tuple[str, str, str, str, str, str] = (
     "common_test",
     "common_dist",
 )
+RESERVED_GENERIC_FILE_EXTEN: list[str] = ["rpyc"]
 RESERVED_GENERIC_FOLD_NAMES: tuple[str, str, str, str] = (
     "generic_template",
     "side",
@@ -298,6 +331,7 @@ RESERVED_GENERIC_FOLD_NAMES: tuple[str, str, str, str] = (
     "interactive",
 )
 RESERVED_GENERIC_CREA_NAMES: tuple[str, str, str] = ("common", "common_test", "common_dist")
+RESERVED_GENERIC_CREA_EXTEN: tuple[str] = ("rpy")
 
 ########################################################
 #
@@ -308,15 +342,32 @@ ZIP_PASSWORD: str = ""
 DEFAULT_TAB: int = 4
 INPUT_FORM: str = f"\n>{"."*DEFAULT_TAB}"
 DEFAULT_KIND_IMPORT: Literal["source", "dev", "zip"] = "dev"
+FILE_NAME_REPLACE: dict[int, str] = str.maketrans(
+    {
+        "("    : "",
+        "!"    : " ",
+        ")"    : "",
+        "-"    :"_"
+    }
+)
+FILE_NAME_REPLACE_LONG: dict[str, str] = {
+    "scene": "scn",
+}
 
-
-BUILDIN_TEMPLATES: dict[str, dict[str, dict[str, list[str] | str] | list[str]] | str] = {
-    "normal": "image %(name)s = %(path)s\n",
-    "scale": "image %(name)s = im.Scale(%(path)s, %(size)s)\n",
-    "fliped": "image %(name)s flip = im.Flip(%(path)s, horizontal=True)\n",
-    "side": "image side {abbr} %(name)s = im.Scale(%(path)s, %(size)s)\n",
-    "sound": "define audio.%(name)s = %(path)s\n",
-    "video": "image %(name)s = Movie(play=%(path)s, bypass=True)\n",
+BUILDIN_TEMPLATES: dict[TemplateKeys, dict[str, dict[str, list[str] | str] | list[str]] | str] = {
+    TemplateKeys.NORMAL: "image %(name)s = %(path)s\n",
+    TemplateKeys.SCALE: "image %(name)s = im.Scale(%(path)s, %(size)s)\n",
+    TemplateKeys.FLIPED: "image %(name)s flip = im.Flip(%(path)s, horizontal=True)\n",
+    TemplateKeys.SIDE: "image side {abbr} %(name)s = im.Scale(%(path)s, %(size)s)\n",
+    TemplateKeys.SOUND: "define audio.%(name)s = %(path)s\n",
+    TemplateKeys.VIDEO: "image %(name)s = Movie(play=%(path)s, bypass=True)\n",
+    TemplateKeys.ZIPLOAD: "renpy.loadbytes(' %(file)s', '%(path)s', '%(kind)s')"
+}
+BUILDIN_PATH_TEMPLATES: dict[TemplatePath, str] = {
+    TemplatePath.ENCRYPT: "%(path)s/%(file)s.enc",
+    TemplatePath.NORMAL : "%(path)s/%(file)s",
+    TemplatePath.ZIP    : "%(path)s/%(file)s.zip"
+    
 }
 
 ########################################################
@@ -324,28 +375,31 @@ BUILDIN_TEMPLATES: dict[str, dict[str, dict[str, list[str] | str] | list[str]] |
 # Path handlers zone
 #
 ########################################################
-ROOT_EXE_GAME: Path = Path(".")
+ROOT_EXE_GAME: Path = Path(getcwd())
 ROOT_RES_SOFT: Path = Path(user_data_dir(__product__, __author__))
 
-_literal_fields = Literal["dir", "file", "both"]
-def get_from_directory(
-    origin: Path = Path("."), kind: _literal_fields = "file", **kwargs
+_literal_fields_files = Literal["dir", "file", "both"]
+
+_literal_fields_exten = Literal["image", "sound", "video"]
+
+def get_list_system_dirs(
+    origin: Path = Path("."), kind: _literal_fields_files = "file", **kwargs
 ) -> list[str | list[str]]:
     match kind:
         case "both":
             return [
-                list(filter(path.isfile, listdir(origin))),
-                list(filter(path.isdir, listdir(origin))),
+                get_list_system_dirs(origin, "dir"),
+                get_list_system_dirs(origin, "file")
             ]
         case "dir":
-            return list(filter(path.isdir, listdir(origin)))
+            return list(filter(lambda x: (origin / x).is_dir(), listdir(origin)))
         case "file":
-            return list(filter(path.isfile, listdir(origin)))
+            return list(filter(lambda x: (origin / x).is_file(), listdir(origin)))
 
 
 logger.info("Starting phase 2: importing config files")
-FORMATS_IMPORTED: dict[str, dict[str, dict[str, list[str] | str] | list[str]] | str]
-if RequiredFiles.TEMPLATES in get_from_directory(ROOT_EXE_GAME, "file"):
+FORMATS_IMPORTED: dict[TemplateKeys, dict[str, dict[str, list[str] | str] | list[str]] | str]
+if RequiredFiles.TEMPLATES in get_list_system_dirs(ROOT_EXE_GAME, "file"):
     FORMATS_IMPORTED = load(open(ROOT_EXE_GAME / RequiredFiles.TEMPLATES, "r"))
 else:
     _ = get_message_translated(MessagesError.FILE_NOT_FOUND).format(
@@ -491,7 +545,7 @@ def mkr_dir(what: str, root: Path | str = ROOT_EXE_GAME) -> Path:
     chdir(cur)
     return cur
 
-def is_reserved(name: str, kind: _literal_fields = "file") -> bool:
+def is_reserved(name: str, kind: _literal_fields_files = "file") -> bool:
     if kind == "both":
         kind = "file"
     
@@ -513,8 +567,8 @@ def is_reserved(name: str, kind: _literal_fields = "file") -> bool:
     else:
         return False
 
-def get_name_as(
-    kind: _literal_fields,
+def get_list_system_file(
+    kind: _literal_fields_files,
     origin: Path = Path("."),
     is_normal: bool = True
 ) -> list[str | list[str]]:
@@ -522,15 +576,15 @@ def get_name_as(
     match kind:
         case "both":
             return [
-                list(filter(lambda x: not is_reserved(x, "file") if is_normal else  is_reserved(x, "file"), get_from_directory(origin, "file"))),
-                list(filter(lambda x: not is_reserved(x, "dir") if is_normal else  is_reserved(x, "dir"), get_from_directory(origin, "dir")))
+                list(filter(lambda x: not is_reserved(x, "file") if is_normal else  is_reserved(x, "file"), get_list_system_dirs(origin, "file"))),
+                list(filter(lambda x: not is_reserved(x, "dir") if is_normal else  is_reserved(x, "dir"), get_list_system_dirs(origin, "dir")))
             ]
         case y if y in ["file", "dir"]:
-            list(filter(lambda x: not is_reserved(x, kind) if is_normal else  is_reserved(x, kind), get_from_directory(origin, kind)))
+            return list(filter(lambda x: not is_reserved(x, kind) if is_normal else  is_reserved(x, kind), get_list_system_dirs(origin, kind)))
         case _:
             return []
 
-def get_names_end_with(
+def get_list_file_extended(
     extension: str | list[str],
     is_normal: bool = True,
     *,
@@ -538,7 +592,7 @@ def get_names_end_with(
     local : list[str] = []
 ) -> list[str]:
     local = (
-        get_name_as("file", origin, is_normal) if len(local) == 0 else local
+        get_list_system_file("file", origin, is_normal) if len(local) == 0 else local
     )
     
     @singledispatch
@@ -561,7 +615,7 @@ def get_names_end_with(
 
     return extend(extension)
 
-def get_names_named_with(
+def get_list_file_named(
     names: str | Sequence[str] | dict[str | Sequence[str]],
     is_normal: bool = True,
     *,
@@ -569,9 +623,9 @@ def get_names_named_with(
     local : list[str] = []
 ) -> list[str]:
     local = (
-        get_name_as("file", origin, is_normal) if len(local) == 0 else local
+        get_list_system_file("file", origin, is_normal) if len(local) == 0 else local
     )
-    end: list[str]
+    end: list[str] = []
     # NOTE: quizas aqui podamos "mejorar" el procedimiento
     @singledispatch
     def find_file(nm: dict) -> list[str]:
@@ -619,7 +673,7 @@ def get_names_named_with(
 
     return find_file(names)
 
-def get_names_filtered(
+def get_list_files(
     names: list[str],
     extesions: list[str],
     is_normal: bool = True,
@@ -627,18 +681,209 @@ def get_names_filtered(
     local : list[str] = []
 ) -> list[str]:
     
-    local = get_names_named_with(names, is_normal, origin=origin, local=local)
-    local = get_names_end_with(extesions, is_normal, origin=origin, local=local)
+    local = get_list_file_named(names, is_normal, origin=origin, local=local)
+    local = get_list_file_extended(extesions, is_normal, origin=origin, local=local)
     
     return local
 
-def get_parsed_path(start: str, origin: Path = Path(".")) -> str:
+def get_path_parsed(start: str, origin: Path = Path(".")) -> str:
+    if not origin.is_dir():
+        origin = Path(mkr_str(origin.as_posix().split("/")[:-1]))
     normal: list[str] = origin.as_posix().split("/")
     dir_exits = start in normal
     if not dir_exits:
         #TODO: mensaje de error
-        pass
+        return origin.as_posix()
     return mkr_str(normal if not dir_exits else normal[normal.index(start):] , "/") 
+
+def scan_folder_for(folder: str, origin: Path = Path("."), is_normal: bool = True) -> bool:
+    folders: list[str] = get_list_system_file("dir", origin, is_normal)
+    if folder in folders:
+        return True
     
+    for name in folders:
+        origin = origin / name
+        if not origin.exists():
+            #TODO: add error
+            continue
+        
+        if scan_folder_for(folder, origin, is_normal):
+            return True
+        
+        origin = origin / ".."
+    
+    return False
+
+def scan_subfolder_do[T](
+    what: Callable[[], T],
+    exclude: Sequence[str],
+    origin: Path = Path("."),
+    *args,
+    **kwargs
+) -> list[T]:
+    def wrapper(ori: Path = Path(".")) -> list[str]:
+        return list(filter(lambda x: not x in exclude, get_list_system_file("dir", ori)))
+    
+    final: list[T] = []
+    
+    for name in wrapper(origin):
+        origin = origin / name
+
+        if not origin.exists():
+            continue
+    
+        if len(wrapper(origin)) != 0:
+            scan_subfolder_do(what, exclude, origin, *args, **kwargs)
+    
+        if len(get_list_system_file("file", origin)) != 0:
+            final+=what(*args, **kwargs)
+    
+        origin = origin / ".."
+    
+    return final
+
+def scan_file_compressed(kind: _literal_fields_exten = "image", origin: Path = Path(".")) -> bool:
+    
+    vr: list[str]
+    match kind:
+        case "image": vr = DEFAULT_EXTEND_IMAGE_NOT_SUPPORT
+        case "sound": vr = DEFAULT_EXTEND_SOUND_NOT_SUPPORT
+        case "video": vr = DEFAULT_EXTEND_VIDEO_NOT_SUPPORT
+        case _:
+            print(get_message_translated(MessagesError.ARGUMENT_NOT_FOUND, name=vr))
+            vr = DEFAULT_EXTEND_IMAGE_NOT_SUPPORT
+    
+    files = get_list_file_extended(vr, origin=origin)
+    has_files = len(files) != 0
+    if has_files:
+        message: list[str] = [get_message_translated(MessagesError.EXTENSION_ERROR)]
+        for n in files:
+            message.append(f"N: {len(message)} FILE: {n} BASED {origin.resolve().as_posix()}")
+        message: str = mkr_str(add_jump(message))
+        print(message)
+        logger.warning(message)
+        
+    return has_files
+
+def rm_defaults(origin: Path = Path(".")) -> None:
+    if not __can_edit__:
+        logger.warning(get_message_translated(MessagesError.FEATURE_NOT_SUPPORTED, name="rm_defaults", reason="the program can't edit/manipulate files"))
+        return
+    
+    remove_file: Path = origin
+    
+    print(get_message_translated(MessagesMeta.MESSAGE_FUNCTION_INIT, name="Remove defaults"))
+    result = "completed"
+    #.copy() is fundamental to no add data to RESERVED_GENERIC_FILE_EXTEN or others
+    extensions_to_delete: list[str] = RESERVED_GENERIC_FILE_EXTEN.copy()
+    for file in tqdm(RESERVED_GENERIC_FILE_NAMES, colour=ColorPerLevel.INTERNAL, desc=get_message_translated(MessagesMeta.MESSAGE_FUNCTION_PROGRESS, name="Remove default")):
+        try:
+            if file in RESERVED_GENERIC_CREA_NAMES:
+                extensions_to_delete+=RESERVED_GENERIC_CREA_EXTEN
+            
+            for extension in extensions_to_delete:
+                remove_file = remove_file.joinpath(file+"."+extension)
+                if not (remove_file.exists() and remove_file.is_file()):
+                    continue
+                
+                remove(remove_file)
+        except FileNotFoundError:
+            print(get_message_translated(MessagesError.FILE_NOT_FOUND, file=file))
+        except Exception as e:
+            result = "unknown error"
+            print(get_message_translated(MessagesMeta.MESSAGE_INFO, name=file, operation="Remove defaults", result=str(e)))
+    print(get_message_translated(MessagesMeta.MESSAGE_FUNCTION_ENDED, name="Remove defaults", result=result))
+
+
+########################################################
+#
+# Functionally related zone
+#
+########################################################
+def get_name_acron(limit: int = 3, origin: Path = Path(".")) -> str:
+    files_waited = RESERVED_GENERIC_FILE_NAMES[0:2] #character.rpy and its plural just in case
+    _: Path = origin
+    
+    _tmp_file: list[str]
+    file_acron: str = ""
+    
+    for i in tqdm(range(limit), colour=ColorPerLevel.INTERNAL, desc=get_message_translated( MessagesMeta.MESSAGE_FUNCTION_PROGRESS, name="getting acron")):
+        _tmp_file = get_list_file_named(files_waited, False, origin=_)
+        
+        if len(_tmp_file) != 0:
+            file_acron = _tmp_file[0]
+            break
+        _ = _ / ".."
+    
+    _ = _ / file_acron
+    file_found: bool = not i + 1 >= limit or file_acron != ""
+    is_empty  : bool = not (_.is_file and _.exists() and _.open().readlines() != 0)
+    manual_use: bool = False
+    if file_found and not is_empty:
+        for line in _.open().read().split(","):
+            a = line.split("=")
+            del_jump(a)
+            if a[0].replace(" ", "") == "image":
+                file_acron = a[1].replace("\"", "").replace(")", "")
+                break
+    else:
+        manual_use = True
+        print(get_message_translated(MessagesMeta.MESSAGE_FUNCTION_ENDED, name="get_character_acron", result="character's file couldn't be found in "+str(_)+" based on "+str(origin)))
+
+    if manual_use or file_acron == "":
+        file_acron = get_path_parsed("images", origin)[1][:2]
+    print(get_message_translated(MessagesMeta.MESSAGE_FUNCTION_ENDED, name="get_character_acron", result="founded and used with "+file_acron))
+    return file_acron
+
+def get_list_namesimple(origin: Path = Path(".")) -> list[str]:
+    names: list[str] = []
+    for name in get_list_system_file("dir", origin):
+        
+        if name in RESERVED_GENERIC_FOLD_NAMES[:-1]:
+            continue
+        
+        origin = origin / name
+        if not origin.exists():
+            continue
+        
+        [names.append(get_path_parsed("assets", origin) + "/" + _name ) for _name in get_list_file_extended(DEFAULT_EXTEND_IMAGE_SUPPORT, origin=origin)]
+
+        if len(get_list_system_file("dir")) != 0:
+            names+= get_list_namesimple(origin)
+        origin = origin / ".."
+    return names
+
+
+def get_name_template(
+        file: str,
+        path: str,
+        kind: _literal_fields_exten = "images",
+        mode: tuple[bool, int] = (False, 0)
+    ) -> tuple[str, str]:
+    
+    file = file.split(".")[0].translate(FILE_NAME_REPLACE)
+    for origin, to in FILE_NAME_REPLACE_LONG.items():
+        file.replace(origin, to)
+
+    info: dict[str, str] = {
+        "path": path,
+        "file": file
+    }
+
+    match DEFAULT_KIND_IMPORT:
+        case "dev": #normal import
+            path = BUILDIN_PATH_TEMPLATES[TemplatePath.NORMAL]
+        case "source": #when encrypted
+            path = BUILDIN_PATH_TEMPLATES[TemplatePath.ENCRYPT]
+        case "zip": #when exported as .zip file, your renpy SDK should support this feature
+            if not TemplateKeys.ZIPLOAD in FORMATS_IMPORTED:
+                path = BUILDIN_PATH_TEMPLATES[TemplatePath.NORMAL]
+            else:
+                path = BUILDIN_PATH_TEMPLATES[TemplatePath.ZIP]
+            
+
+    path = path % info
+
+    return file, path
 
 
