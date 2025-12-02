@@ -1,5 +1,5 @@
 # error code
-# 1 -> falta libreria importante
+# 1 -> mising important lib
 # 2 -> incorrect version
 ########################################################
 #
@@ -9,6 +9,7 @@
 import sys
 import logging
 import warnings
+from platform import system
 from os import listdir, getcwd, remove
 
 ########################################################
@@ -83,15 +84,16 @@ from configparser import ConfigParser
 
 class ImageConfigHead(StrEnum):
     SIDE = "side"
-    ANIMATION = "animation"
     SCALE = "scale"
     TEMPLATE = "template"
 
 
 class ImageConfigValue(StrEnum):
     SIZE = "size"
+    SQUARE = "square"
     DIMENSION = "dimension"
     KEYS = "keys"
+    REPEAT = "repeat"
 
 
 class FeaturesKeywords(StrEnum):
@@ -100,10 +102,12 @@ class FeaturesKeywords(StrEnum):
     IMAGE_CREATION = "i"
     RENAMING_PROCESS = "s"
     SIDE_GENERATION = "ms"
+    PRETTY_PRINT = "m"
 
 
 class RequiredFiles(StrEnum):
     TEMPLATES = "templates.json"
+    ANIMATED = "keys.json"
 
 
 class ColorPerLevel(StrEnum):
@@ -120,6 +124,7 @@ class ProccesKeywords(StrEnum):
     ANIMATED = "m"
     NOTHING = "n"
     IGNORE = "g"
+    SUBFOLDER = "r"
 
 
 class ParseKeywords(StrEnum):
@@ -162,6 +167,8 @@ class TemplateKeys(StrEnum):
     SOUND = "sound"
     VIDEO = "video"
     ZIPLOAD = "zip_load"
+    ANIMATED_BLINK_NORMAL = "animated_blink_normal"
+    ANIMATED_ANIMATED_BODY = "animated_body"
 
 
 class TemplatePath(StrEnum):
@@ -267,7 +274,7 @@ def get_message_translated(name: str, /, **kwargs: dict[str, str]) -> str:
 # in case is required and this doesn't is delivered with python, use __return__ variable
 # to make the program die after the error is launched (typing_extensions module section is an example of how-to)
 #
-# NOTE 2.0: if some class/module is required/used by the program, but there's could an alternative or workaround, don't use
+# NOTE 2.0: if some class/module is required/used by the program, but there's an alternative or workaround, don't use
 # __return__, just declare its class or function when needed (just like with tqdm)
 #
 ########################################################
@@ -358,6 +365,30 @@ except ModuleNotFoundError:
     warnings.warn(
         get_message_translated(MessagesError.MODULE_NOT_FOUND).format(name="tqdm")
     )
+
+try:
+    from colorama import Fore
+except ModuleNotFoundError:
+
+    class Fore(StrEnum):
+        BLACK = "\033[30m"
+        RED = "\033[31m"
+        GREEN = "\033[32m"
+        YELLOW = "\033[33m"
+        BLUE = "\033[34m"
+        MAGENTA = "\033[35m"
+        CYAN = "\033[36m"
+        WHITE = "\033[37m"
+        RESET = "\033[38m"
+
+    logger.warning(
+        get_message_translated(MessagesError.MODULE_NOT_FOUND).format(name="colorama")
+    )
+    warnings.warn(
+        get_message_translated(MessagesError.MODULE_NOT_FOUND).format(name="colorama")
+    )
+
+
 try:
     from PIL import Image, UnidentifiedImageError
 
@@ -365,6 +396,12 @@ try:
         logger.info(
             get_message_translated(MessagesError.MODULE_NOT_FOUND).format(
                 name=FeaturesKeywords.IMAGE_CREATION
+            )
+        )
+    if not add_feature(FeaturesKeywords.SIDE_GENERATION):
+        logger.info(
+            get_message_translated(MessagesError.MODULE_NOT_FOUND).format(
+                name=FeaturesKeywords.SIDE_GENERATION
             )
         )
 except ModuleNotFoundError:
@@ -452,9 +489,7 @@ DEFAULT_PATH_VIDEO = "%(base)s/video"  # base
 DEFAULT_PATH_SOUND = "%(base)s/sound"  # base
 DEFAULT_PATH_IMAGE = "%(base)s/image"  # base
 
-DEFAULT_PATH_SIDE = (
-    f"%({TemplatePathKeys.BASE})s/%({TemplatePathKeys.NAME})s/side"  # mostly for images
-)
+DEFAULT_PATH_SIDE = f"%({TemplatePathKeys.BASE})s/side"  # mostly for images
 
 
 ########################################################
@@ -507,6 +542,7 @@ RESERVED_GENERIC_CREA_EXTEN: tuple[str] = "rpy"
 ########################################################
 ZIP_PASSWORD: str = ""
 DEFAULT_TAB: int = 4
+DEFAULT_NAME_LIMIT: int = 3
 INPUT_FORM: str = f"\n>{"."*DEFAULT_TAB}"
 DEFAULT_KIND_IMPORT: Literal["source", "dev", "zip"] = "dev"
 FILE_NAME_REPLACE: dict[int, str] = str.maketrans(
@@ -516,24 +552,50 @@ FILE_NAME_REPLACE_LONG: dict[str, str] = {
     "scene": "scn",
 }
 
-BUILDIN_TEMPLATES: dict[TemplateKeys | str, str | list[str]] = {
-    TemplateKeys.NORMAL: "image %(name)s = %(path)s\n",
-    TemplateKeys.SCALE: "image %(name)s = im.Scale(%(path)s, %(size_scale)s)\n",
-    TemplateKeys.FLIPED: "image %(name)s flip = im.Flip(%(path)s, horizontal=True)\n",
-    TemplateKeys.SIDE: "image side %(abbr)s %(name)s = im.Scale(%(path)s, %(size_side)s)\n",
-    TemplateKeys.SOUND: "define audio.%(name)s = %(path)s\n",
-    TemplateKeys.VIDEO: "image %(name)s = Movie(play=%(path)s, bypass=True)\n",
-    TemplateKeys.ZIPLOAD: "renpy.loadbytes(' %(file)s', '%(path)s', '%(kind)s')",
+########################################################
+#
+# Buildin zone
+#
+########################################################
+
+BUILDIN_TEMPLATES: dict[TemplateKeys | str, str | list[str | bool | list[str]]] = {
+    TemplateKeys.NORMAL: 'image %(name)s = "%(path)s"\n',
+    TemplateKeys.SCALE: 'image %(name)s = im.Scale("%(path)s", %(size_scale)s)\n',
+    TemplateKeys.FLIPED: 'image %(name)s flip = im.Flip("%(path)s", horizontal=True)\n',
+    TemplateKeys.SIDE: 'image side %(abbr)s %(name)s = im.Scale("%(path)s", %(size_side)s)\n',
+    TemplateKeys.SOUND: 'define audio.%(name)s = "%(path)s"\n',
+    TemplateKeys.VIDEO: 'image %(name)s = Movie(play="%(path)s", bypass=True)\n',
+    TemplateKeys.ZIPLOAD: "renpy.loadbytes('%(file)s', '%(path)s', '%(kind)s')",
+    TemplateKeys.ANIMATED_BLINK_NORMAL: [
+        True,
+        "image %(name)s blink:",
+        ["repeat", '%(tab)s"%(path)s"', "%(tab)sBlinkSpeed"],
+    ],
+    TemplateKeys.ANIMATED_ANIMATED_BODY: [
+        True,
+        "image %(name)s:",
+        "%(tab)sparallel:",
+        [
+            "repeat",
+            '%(tab)s%(tab)sim.Scale("%(path)s", %(size_scale)s) with Dissolve(0.2)',
+            "%(tab)s%(tab)s0.5",
+        ],
+        "%(tab)sparallel:",
+        "%(tab)s%(tab)sxzoom -1.0",
+        "%(tab)s%(tab)sxalign -20.0",
+        "%(tab)s%(tab)slinear 2.0 xalign -8.0",
+    ],
 }
+
 BUILDIN_FILE_TEMPLATES: dict[TemplatePath, str] = {
     TemplatePath.ENCRYPT: "%(path)s/%(file)s.enc",
     TemplatePath.NORMAL: "%(path)s/%(file)s",
     TemplatePath.ZIP: "%(path)s/%(file)s.zip",
 }
 
-BUILDIN_NAME_ANIMATION: dict[str, list[str]] = {
-    "walk": ["walking"],
-    "blink": ["blink", "e"],
+BUILDIN_ANIMATION_KEYS: dict[TemplateKeys, list[str]] = {
+    TemplateKeys.ANIMATED_ANIMATED_BODY: ["walking"],
+    TemplateKeys.ANIMATED_BLINK_NORMAL: ["blink", "e"],
 }
 
 ########################################################
@@ -548,12 +610,13 @@ _literal_fields_files = Literal["dir", "file", "both"]
 
 _literal_fields_exten = Literal["image", "sound", "video"]
 
-_literal_image_argumt = Literal["acron"]
-
-
 def get_list_system_dirs(
     origin: Path = Path("."), kind: _literal_fields_files = "file", **kwargs
 ) -> list[str | list[str]]:
+
+    if not origin.exists():
+        return []
+
     match kind:
         case "both":
             return [
@@ -579,6 +642,19 @@ else:
     )
     logger.warning(_)
     FORMATS_IMPORTED = BUILDIN_TEMPLATES
+
+KEYS_IMPORTED: dict[TemplateKeys, list[str]]
+if RequiredFiles.TEMPLATES in get_list_system_dirs(ROOT_EXE_GAME, "file"):
+    KEYS_IMPORTED = load(open(ROOT_EXE_GAME / RequiredFiles.ANIMATED, "r"))
+else:
+    _ = get_message_translated(MessagesError.FILE_NOT_FOUND).format(
+        file=RequiredFiles.ANIMATED
+    )
+    _ += ", " + get_message_translated(MessagesError.USING_BUILT_IN).format(
+        name="keys_imported"
+    )
+    logger.warning(_)
+    KEYS_IMPORTED = BUILDIN_ANIMATION_KEYS
 logger.info("Ended phase 2")
 
 
@@ -711,12 +787,12 @@ parser: ArgumentParser = ArgumentParser(
 ########################################################
 def mkr_dir(what: str, root: Path | str = ROOT_EXE_GAME) -> Path:
     actual: Path
-    if root is str:
+    if isinstance(root, Path):
         actual = Path(root)
-    elif root is Path:
+    elif isinstance(root, Path):
         actual = root
     else:
-        actual = Path(".")
+        actual = Path(".").resolve()
     cur: Path = actual / what
     try:
         cur.mkdir()
@@ -740,6 +816,16 @@ def is_reserved(name: str, kind: _literal_fields_files = "file") -> bool:
         return name in SKIP_FILE_NAME or name in RESERVED_GENERIC_FILE_NAMES
     else:
         return False
+
+
+def is_animated_name(name: str) -> TemplateKeys:
+    for part in name.split("_"):
+
+        for key, parts in KEYS_IMPORTED.items():
+            if part in parts:
+                return key
+
+    return None
 
 
 def get_list_system_file(
@@ -889,6 +975,25 @@ def get_list_files(
     return local
 
 
+def get_list_subfolders(
+    origin: Path = Path("."), exclude: Sequence[str] = []
+) -> list[str]:
+    folders = [
+        origin / x for x in get_list_system_file("dir", origin) if not x in exclude
+    ]
+    for x in folders.copy():
+
+        if x.resolve() == origin.resolve():
+            continue
+
+        if not x.exists():
+            continue
+
+        folders += get_list_subfolders(x, exclude)
+
+    return folders.copy()
+
+
 def get_path_parsed(start: str | list[str], origin: Path = Path(".")) -> str:
     if not origin.is_dir():
         origin = Path(mkr_str(origin.as_posix().split("/")[:-1]))
@@ -938,6 +1043,26 @@ def get_path_parsed(start: str | list[str], origin: Path = Path(".")) -> str:
     return mkr_str(
         normal if not dir_exits else normal[normal.index("/".join(start)) :], "/"
     )
+
+
+def get_name_parsed(file: str) -> str:
+    # NOTE: most of dev use VS Code, so replacing the spaces for _, will make the extesion include
+    # the file within the context window, cuz using spaces based, it will make some trouble
+    file = file.replace("!", " ").replace(" ", "_")
+    lstd: str = ""
+    if file.split("_")[-1].isdigit():
+        lstd = file.split("_")[-1] + "_base"
+
+    for i in range(0, 10):
+        while file.count(str(i)) != 0:
+            file = file.replace(str(i), "")
+    file: list[str] = file.split("_")
+    if lstd != "":
+        file.append(lstd)
+
+    file = [i for i in file if len(i) != 0]
+
+    return "_".join(file)
 
 
 def scan_folder_for(
@@ -1018,9 +1143,9 @@ def scan_file_compressed(
         message: list[str] = [get_message_translated(MessagesError.EXTENSION_ERROR)]
         for n in files:
             message.append(
-                f"N: {len(message)} FILE: {n} BASED {origin.resolve().as_posix()}"
+                f"\nN: {len(message)} FILE: {n} BASED {origin.resolve().as_posix()}"
             )
-        message: str = mkr_str(add_jump(message))
+        message: str = mkr_str(message)
         logger.warning(message)
 
     return has_files
@@ -1142,7 +1267,7 @@ def get_name_acron(limit: int = 3, origin: Path = Path(".")) -> str:
         )
 
     if manual_use or file_acron == "":
-        file_acron = get_path_parsed("images", origin)[1][:2]
+        file_acron = get_path_parsed(DEFAULT_PATH_IMAGE.split("/")[1], origin)[1][:2]
     print(
         get_message_translated(
             MessagesMeta.MESSAGE_FUNCTION_ENDED,
@@ -1165,7 +1290,7 @@ def get_list_namesimple(origin: Path = Path(".")) -> list[str]:
             continue
 
         [
-            names.append(get_path_parsed("assets", origin) + "/" + _name)
+            names.append(get_path_parsed(DEFAULT_RESOURCE_PATH, origin) + "/" + _name)
             for _name in get_list_file_extended(
                 DEFAULT_EXTEND_IMAGE_SUPPORT, origin=origin
             )
@@ -1177,7 +1302,9 @@ def get_list_namesimple(origin: Path = Path(".")) -> list[str]:
     return names
 
 
-def get_name_template(file: str, path: str, mode: ParseKeywords) -> tuple[str, str]:
+def get_name_template(
+    file: str, path: str, mode: ParseKeywords, limit: int = DEFAULT_NAME_LIMIT
+) -> tuple[str, str]:
     file, extend = file.split(".", 1)
     file = file.translate(FILE_NAME_REPLACE)
     for origin, to in FILE_NAME_REPLACE_LONG.items():
@@ -1216,14 +1343,19 @@ def get_name_template(file: str, path: str, mode: ParseKeywords) -> tuple[str, s
                 message="get_name_template",
             )
         )
+    # fix from here:
+    # https://github.com/SpikeInterface/spikeinterface/blob/7268ab900443ca3f0239de3007352d05f2d7d875/spikeinterface/sorters/runsorter.py#L203#L203
+    if system() == "Windows":
+        rt = Path(str(ROOT_EXE_GAME)[str(ROOT_EXE_GAME).find(":") + 1 :])
+    else:
+        rt = ROOT_EXE_GAME
 
-    path = path % info
-
+    path = (path % info).replace(rt.as_posix(), "").replace("C:/", "")
     match mode:
         case ParseKeywords.FILE:
             pass  # ?
         case ParseKeywords.FOLDER:
-            file = path.replace("/", " ").split(".")[0]
+            file = " ".join(path.split("/")[limit:]).split(".")[0]
         case _:
             pass
 
@@ -1234,7 +1366,6 @@ def write_side_image(
     size: tuple[int, int, int, int],
     load: dict[TemplatePathKeys, str | list[str]],
     file_generation_limit: int = 99,
-    custom: dict[str, list[str]] = BUILDIN_NAME_ANIMATION,
 ) -> bool:
     if not __can_edit__ or not (
         has_feature(FeaturesKeywords.IMAGE_CREATION)
@@ -1258,25 +1389,36 @@ def write_side_image(
                 result=msg.args,
             )
         )
-        size = DEFAULT_SIZE_SIDE_VAR
+        size = DEFAULT_SIZE_CORP_VAR
 
     # check the fields required (just in case)
-    if not has_required_keys(load.keys(), TemplatePathKeys, "write_side_image"):
+    # if not has_required_keys(load.keys(), TemplatePathKeys):
+    #    return False
+
+    if not TemplatePathKeys.BASE in load:
+        return False
+    origin: Path = Path(DEFAULT_PATH_SIDE % load).resolve()
+    if not (origin / "..").exists():
         return False
 
-    origin: Path = Path(DEFAULT_PATH_SIDE % load)
-    if not origin.exists():
-        return False
-
-    _ = origin / ".."
+    _ = (origin / "..").resolve()
 
     if not _.exists():
         return False
 
-    files: list[str] = get_list_file_named(custom, origin=_)[:file_generation_limit]
-
+    files: list[str] = get_list_system_file("file", origin=_)[:file_generation_limit]
     try:
-        rmtree(origin)
+        if origin.as_posix().split("/")[-1] == "side":
+            rmtree(origin)
+        else:
+            print(
+                get_message_translated(
+                    MessagesMeta.MESSAGE_INFO,
+                    name="delete",
+                    operation="remove side folder",
+                    result="cancel by path: " + origin.as_posix(),
+                )
+            )
     except FileNotFoundError:
         pass
 
@@ -1296,7 +1438,7 @@ def write_side_image(
         colour=ColorPerLevel.INTERNAL,
         desc=get_message_translated(
             MessagesMeta.MESSAGE_FUNCTION_PROGRESS,
-            name="write side images for " + load[TemplatePathKeys.NAME][-1],
+            name="write side images for " + load[TemplatePathKeys.NAME],
         ),
     ):
         file_path_side = origin / file  # include '/side'
@@ -1325,9 +1467,10 @@ def write_side_image(
         get_message_translated(
             MessagesMeta.MESSAGE_FUNCTION_ENDED,
             name="write_side_image",
-            result=f"ERROR: {str(has_error)}",
+            result=f"ERROR: {"yes" if has_error else "no"}",
         )
     )
+    return not has_error
 
 
 def write_common_file(
@@ -1361,7 +1504,7 @@ def write_common_file(
     else:
         # smart way to get the file's type based
         files = scan_subfolder_do(
-            lambda: (
+            lambda x: (
                 get_list_system_file("file")
                 if len(get_list_system_file("file")) != 0
                 else []
@@ -1386,7 +1529,7 @@ def write_common_file(
 
         logger.warning(
             get_message_translated(
-                MessagesMeta.INCORRECT_ARGUMENTS,
+                MessagesError.INCORRECT_ARGUMENTS,
                 arguments=str(modes),
                 default=kind,
                 message=origin.as_posix(),
@@ -1425,6 +1568,7 @@ def write_common_file(
 
     resource_path %= {"base": DEFAULT_RESOURCE_PATH}
     simple_path_base = get_path_parsed(resource_path.split("/"), origin)
+
     if len(simple_path_base.split("/")) <= 1:
         logger.warning(
             get_message_translated(
@@ -1435,18 +1579,8 @@ def write_common_file(
         )
         return
 
-    extra_import: str = (
-        simple_path_base.split("/")[-2] if len(simple_path_base.split("/")) >= 2 else ""
-    )
-    from_name: list[str] = simple_path_base.split("/", 1)[1].split("/")
-    # NOTE: maybe if use an Enum instead of Literal... that might be useful
-    local_vars: dict[_literal_image_argumt, str] = {}
-
-    load_util: dict[TemplatePathKeys, str | list[str]] = {
-        TemplatePathKeys.BASE: simple_path_base,
-        TemplatePathKeys.NAME: from_name,
-    }
     size_side: tuple[int, int, int, int] = ()
+    size_square: tuple[str, str] = ()
     _size_scale: str = info.get(
         ImageConfigHead.SCALE, ImageConfigValue.DIMENSION, fallback=DEFAULT_SIZE_SCREEN
     )
@@ -1460,54 +1594,67 @@ def write_common_file(
         # TODO: add error message
         size_scale = tuple([int(x) for x in DEFAULT_SIZE_SCREEN.split("x")])
 
-    match extra_import:
-        case knd if FeaturesKeywords.SIDE_GENERATION in modes and knd == "side":
-            acron = get_name_acron(origin=origin)
-            local_vars["acron"] = acron
-            size_side = info.get(
-                ImageConfigHead.SIDE,
-                ImageConfigValue.SIZE,
-                fallback=DEFAULT_SIZE_CORP_VAR,
+    use_side: bool = False
+
+    if ProccesKeywords.SIDE in modes:
+        size_side = info.get(
+            ImageConfigHead.SIDE,
+            ImageConfigValue.SIZE,
+            fallback=DEFAULT_SIZE_CORP_VAR,
+        )
+        size_square = info.get(
+            ImageConfigHead.SIDE,
+            ImageConfigValue.SQUARE,
+            fallback=DEFAULT_SIZE_SIDE_VAR,
+        ).split("x")
+
+    if ProccesKeywords.SUBFOLDER in modes:
+        folders += get_list_subfolders(origin)
+
+    if has_feature(FeaturesKeywords.SIDE_GENERATION):
+        
+        use_side = True
+        for folder in folders:
+            if folder == "":
+                folder = origin
+            simple_path = get_path_parsed(
+                resource_path.split("/"),
+                folder
             )
-
-            animation_keys: dict[str, list[str]] | str = info.get(
-                ImageConfigHead.ANIMATION,
-                ImageConfigValue.KEYS,
-                fallback=BUILDIN_NAME_ANIMATION,
+            write_side_image(
+                size_side,
+                {
+                    TemplatePathKeys.BASE: simple_path,
+                    TemplatePathKeys.NAME: simple_path.split("/", 1)[1].split("/")[-1]
+                }
             )
-
-            if isinstance(animation_keys, str):
-                fields: list[str] = animation_keys.split(";")
-                for part in fields:
-
-                    if part.count(":") == 0:
-                        continue
-                    # TODO: add check in case this fails
-                    animation_keys[part.split(":")[0]] = part.split(":")[1].split(",")
-
-            write_side_image(size_side, load_util, custom=animation_keys)
-            modes.append(ProccesKeywords.SIDE)
+        
+        #use_side = write_side_image(size_side, load_util)
 
     _path: Path = origin
+    abbr = get_name_acron(origin=origin)
+    if abbr == "":
+        abbr = "rdnd"
     # HACK: this might be more a TODO than a HACK, but somebody
     # need to take care of those Enums in order to make it similar and not a
     # single letter
     modes.append(
         [
             kind,
-            (size_side if len(size_side) != 0 else DEFAULT_SIZE_CORP_VAR),
+            (size_square if len(size_square) != 0 else DEFAULT_SIZE_SIDE_VAR),
             size_scale,
+            use_side,
         ]
     )
+    lines = []
     for folder in folders:
         if folder == "":
             _path /= "."
         else:
-            _path /= folder
+            _path = folder
         _path = _path.resolve()
 
         if not _path.exists():
-            _path /= ".."
             continue
 
         files = (
@@ -1519,13 +1666,32 @@ def write_common_file(
         )
         # NOTE: yeah, this sucks
         simple_path_base = get_path_parsed(resource_path.split("/"), _path)
-
-        if ProccesKeywords.ALL in modes or ProccesKeywords.ANIMATED in modes:
-            ...
-
-        mkr_lines_list(simple_path_base, files, modes, _path)
-
-        _path /= ".."
+        print(Fore.RESET)
+        print(
+            Fore.BLUE
+            + get_message_translated(
+                MessagesMeta.MESSAGE_FUNCTION_INIT, name=simple_path_base
+            )
+        )
+        _ = mkr_lines_list(simple_path_base, abbr, files, modes, _path)
+        print(
+            Fore.RED
+            + get_message_translated(
+                MessagesMeta.MESSAGE_FUNCTION_ENDED,
+                name=simple_path_base,
+                result="completed" if len(_) != 0 else "incompleted",
+            )
+        )
+        _.append("\n")
+        lines.extend(_)
+    print(Fore.RESET)
+    if __can_edit__:
+        open(
+            origin
+            / ("common_dist.py" if DEFAULT_KIND_IMPORT == "zip" else "common.rpy"),
+            "w",
+        ).writelines(lines)
+        print("Common created in ", origin)
 
 
 ########################################################
@@ -1534,25 +1700,39 @@ def write_common_file(
 #
 ########################################################
 def mkr_lines_list(
-    simple_path: str, files: list[str], modes: list[str], folder: Path = Path(".")
+    simple_path: str,
+    abbr: str,
+    files: list[str],
+    modes: list[str],
+    folder: Path = Path("."),
 ) -> list[str]:
     # NOTE: well... this is mostly a TODO than a NOTE, but... I think we could do better if we
     # check simple_path and folder, there might be a case where they might are not realted
     # since this function excepts both be related to the other
     lines: list[str] = []
-    print(get_message_translated(MessagesMeta.MESSAGE_FUNCTION_INIT, name=simple_path))
+    if abbr in ["", "rdnd"]:
+        abbr = get_name_acron(origin=folder)
+    kind, size_side, size_scale, use_side = modes[-1]
 
-    abbr = get_name_acron(origin=folder)
-    if abbr == "":
-        abbr = "rdnd"
-    kind, size_side, size_scale = modes[-1]
-
+    all_payload: dict[str, list[dict[str, str]]] = {}
     payload: dict[str, str]
     file_name: str
     file_simple_path: str
 
-    template: str
+    def parse_line_recursive(load: dict[str, str], line: list | str) -> str:
+        _tmp = []
+        if isinstance(line, list):
+            for n in line:
+                _tmp.append(parse_line_recursive(load, n))
+        elif isinstance(line, str):
+            _tmp.append(line % load)
+        else:
+            raise TypeError("Unsupported type: " + str(type(line)))
+        return "\n".join(_tmp)
 
+    print(Fore.RESET)
+    result = "not found"
+    # get possible payloads
     for file in tqdm(
         files,
         colour=ColorPerLevel.GENERIC,
@@ -1569,27 +1749,138 @@ def mkr_lines_list(
                 else ParseKeywords.FOLDER
             ),
         )
+        file_name = get_name_parsed(file_name)
 
         payload = {
             "name": file_name,
             "path": file_simple_path,
             "abbr": abbr,
             "kind": kind,
-            "size_side": size_side,
+            "tab": " " * DEFAULT_TAB,
+            "size_side": ", ".join(size_side),
             "size_scale": size_scale,
         }
+        is_animated = (
+            len(file_name.split("_")) >= 2 and file_name.split("_")[-2].isdigit()
+        )
+        parsed_name = ""
+        if is_animated:
+            parsed_name = "_".join(file_name.split("_")[:-2])
+        else:
+            parsed_name = file_name
+
+        if not parsed_name in all_payload:
+            all_payload[parsed_name] = []
+        all_payload[parsed_name].append(payload)
+        result = "completed"
+
+    print(
+        get_message_translated(
+            MessagesMeta.MESSAGE_FUNCTION_ENDED, name="Parsing names...", result=result
+        )
+    )
+
+    real_keys = [key for key in FORMATS_IMPORTED if key in modes]
+    if ProccesKeywords.ANIMATED in modes:
+        real_keys.append(ProccesKeywords.ANIMATED)
+
+    for group, payloads in all_payload.items():
+        can_procces_animations = (
+            ProccesKeywords.ANIMATED in real_keys and len(payloads) > 1
+        )
+
+        print(
+            get_message_translated(
+                MessagesMeta.MESSAGE_FUNCTION_INIT, name=f"Creating lines for '{group}'"
+            )
+        )
+        result = "not proccesed"
 
         for key in FORMATS_IMPORTED:
-            if not key in modes:
-                key = None
+            if not key in real_keys:
+                continue
+
+            anima_key = is_animated_name(group)
+
+            # animation special
+            if can_procces_animations and anima_key == key and isinstance(FORMATS_IMPORTED[key], list):
+                is_animation = FORMATS_IMPORTED[key][0]
+                if is_animation == True:
+                    _0 = []
+
+                    for line in FORMATS_IMPORTED[key][1:]:
+
+                        if isinstance(line, list):
+                            instructions = line[0].split("+")
+                            # NOTE: here should more cases
+                            if ImageConfigValue.REPEAT in instructions:
+                                for info in payloads:
+                                    for n in line[1:]:
+                                        _0.append(parse_line_recursive(info, n))
+                        else:
+                            _0.append(
+                                line
+                                % {
+                                    "name": group,
+                                    "tab": " " * DEFAULT_TAB,
+                                }
+                            )
+                    _0.append("\n")
+                    lines.append("\n".join(_0))
+                    continue
+
+            if isinstance(FORMATS_IMPORTED[key], list) and FORMATS_IMPORTED[key][0]:
+                continue
+
+            if isinstance(FORMATS_IMPORTED[key][0], bool):
+                ref = FORMATS_IMPORTED[key][1:]
             else:
-                break
+                ref = FORMATS_IMPORTED[key]
 
-        print("")
-        print("")
-        print(key)
-        print(payload, " fina")
-        print("")
-    exit()
+            # others
+            for payload in tqdm(
+                payloads,
+                colour=ColorPerLevel.GENERIC,
+                desc=get_message_translated(
+                    MessagesMeta.MESSAGE_FUNCTION_PROGRESS, name="Writing..."
+                ),
+            ):
+                # special case... lol
+                if use_side and key == TemplateKeys.SIDE:
+                    payload = payload.copy()
+                    _tmp_path = payload["path"].split("/")
+                    _tmp_path.insert(-1, "side")
+                    payload["path"] = "/".join(_tmp_path)
 
+                lines.append(parse_line_recursive(payload, ref))
+            result = "completed"
+
+        print(
+            get_message_translated(
+                MessagesMeta.MESSAGE_FUNCTION_ENDED,
+                name=f"Creating lines for '{group}'",
+                result=result,
+            )
+        )
     return lines
+
+
+write_common_file(
+    [
+        ParseKeywords.FOLDER,
+        ProccesKeywords.ALL,
+        ProccesKeywords.ANIMATED,
+        ProccesKeywords.SUBFOLDER,
+        ProccesKeywords.SIDE,
+        
+        TemplateKeys.ANIMATED_BLINK_NORMAL,
+        TemplateKeys.ANIMATED_ANIMATED_BODY,
+        TemplateKeys.SIDE,
+        TemplateKeys.NORMAL,
+        TemplateKeys.FLIPED,
+        
+        ImportKeywords.IMAGES,
+    ],
+    None,
+    Path("./images/Sprites/ailstair"),
+)
