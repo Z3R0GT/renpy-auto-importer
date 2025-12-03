@@ -19,6 +19,11 @@ from os import listdir, getcwd, remove
 ########################################################
 __version__ = "1.0.4.6-dev"
 __return__ = 0
+__return_text__ = [
+    "completed",
+    "missing library, check the logs",
+    "you have an unsupported python version"
+]
 __product__ = "importer"
 __author__ = "Z3R0_GT"
 __is_main__ = __name__ == "__main__"
@@ -108,6 +113,7 @@ class FeaturesKeywords(StrEnum):
 class RequiredFiles(StrEnum):
     TEMPLATES = "templates.json"
     ANIMATED = "keys.json"
+    INFO = "info.cgf"
 
 
 class ColorPerLevel(StrEnum):
@@ -264,6 +270,11 @@ def get_message_translated(name: str, /, **kwargs: dict[str, str]) -> str:
         )
         return "Unkown error"
 
+parser: ArgumentParser = ArgumentParser(
+    "Importer",
+    description=get_message_translated(MessagesMeta.DESCRIPTION),
+    epilog="You can search for more help here! --> https://github.com/Z3R0GT/renpy-auto-importer"
+)
 
 ########################################################
 #
@@ -398,12 +409,6 @@ try:
                 name=FeaturesKeywords.IMAGE_CREATION
             )
         )
-    if not add_feature(FeaturesKeywords.SIDE_GENERATION):
-        logger.info(
-            get_message_translated(MessagesError.MODULE_NOT_FOUND).format(
-                name=FeaturesKeywords.SIDE_GENERATION
-            )
-        )
 except ModuleNotFoundError:
     # copy paste lol
     class UnidentifiedImageError(OSError):
@@ -467,7 +472,7 @@ except ModuleNotFoundError:
         )
     )
 
-sys.exit(__return__) if __return__ != 0 else None
+parser.exit(__return__, __return_text__[__return__]) if __return__ != 0 else None
 logger.info("Ended phase 1")
 
 ########################################################
@@ -509,7 +514,7 @@ DEFAULT_EXTEND_SOUND_SUPPORT: list[str] = ["ogg"]
 
 SKIP_SYMBOLS: list[str] = ["_"]
 SKIP_GEN_NAMES: list[str] = []
-SKIP_FILE_NAME: list[str] = []
+SKIP_FILE_NAME: list[str] = ["gui", "options", "screens"]
 SKIP_FOL_NAMES: list[str] = ["gui", "credits", "logos", "fonts"]
 
 
@@ -610,6 +615,7 @@ _literal_fields_files = Literal["dir", "file", "both"]
 
 _literal_fields_exten = Literal["image", "sound", "video"]
 
+
 def get_list_system_dirs(
     origin: Path = Path("."), kind: _literal_fields_files = "file", **kwargs
 ) -> list[str | list[str]]:
@@ -666,8 +672,8 @@ logger.info("Ended phase 2")
 class SearchEngine:
     """Buscador ligero basado en whoosh"""
 
-    def __init__(self):
-        sc = Schema(path=TEXT(stored=True), content=TEXT(stored=True))
+    def __init__(self, sc: Schema):
+        #sc = sc#Schema(path=TEXT(stored=True), content=TEXT(stored=True))
         self.schema = sc
         sc.add("raw", TEXT(stored=True))
         self.ix = RamStorage().create_index(self.schema)
@@ -773,11 +779,6 @@ def has_required_keys(base: list[str], reference: StrEnum) -> bool:
             print(get_message_translated(MessagesError.ARGUMENT_NOT_FOUND, name=_))
             return False
     return True
-
-
-parser: ArgumentParser = ArgumentParser(
-    "Importer", description=get_message_translated(MessagesMeta.DESCRIPTION)
-)
 
 
 ########################################################
@@ -977,7 +978,7 @@ def get_list_files(
 
 def get_list_subfolders(
     origin: Path = Path("."), exclude: Sequence[str] = []
-) -> list[str]:
+) -> list[str | Path]:
     folders = [
         origin / x for x in get_list_system_file("dir", origin) if not x in exclude
     ]
@@ -1355,11 +1356,21 @@ def get_name_template(
         case ParseKeywords.FILE:
             pass  # ?
         case ParseKeywords.FOLDER:
-            file = " ".join(path.split("/")[limit:]).split(".")[0]
+            ref = []
+            if len(path.split("/")) <= limit:
+                ref = [path.split("/")[-1]]
+            else:
+                ref = path.split("/")[limit:]
+
+            file = " ".join(ref).split(".")[0]
         case _:
             pass
 
     return file, path
+
+
+def write_chipher_images(origin: Path = Path(".")):
+    pass
 
 
 def write_side_image(
@@ -1483,6 +1494,9 @@ def write_common_file(
     if info == None:
         info = ConfigParser()
 
+    if isinstance(origin, str):
+        origin = Path(origin)
+
     if not origin.exists():
         logger.warning(
             get_message_translated(
@@ -1538,11 +1552,17 @@ def write_common_file(
 
     match kind:
         case "image":
-            extend = DEFAULT_EXTEND_IMAGE_SUPPORT
+            extend = DEFAULT_EXTEND_IMAGE_SUPPORT + (
+                DEFAULT_EXTEND_IMAGE_NOT_SUPPORT if ProccesKeywords.NOTHING else []
+            )
         case "sound":
-            extend = DEFAULT_EXTEND_SOUND_SUPPORT
+            extend = DEFAULT_EXTEND_SOUND_SUPPORT + (
+                DEFAULT_EXTEND_SOUND_NOT_SUPPORT if ProccesKeywords.NOTHING else []
+            )
         case "video":
-            extend = DEFAULT_EXTEND_VIDEO_SUPPORT
+            extend = DEFAULT_EXTEND_VIDEO_SUPPORT + (
+                DEFAULT_EXTEND_VIDEO_NOT_SUPPORT if ProccesKeywords.NOTHING else []
+            )
         case _:
             # TODO:
             return
@@ -1611,28 +1631,23 @@ def write_common_file(
     if ProccesKeywords.SUBFOLDER in modes:
         folders += get_list_subfolders(origin)
 
-    if has_feature(FeaturesKeywords.SIDE_GENERATION):
-        
+    if has_feature(FeaturesKeywords.SIDE_GENERATION) and ProccesKeywords.SIDE in modes:
+
         use_side = True
         for folder in folders:
             if folder == "":
                 folder = origin
-            simple_path = get_path_parsed(
-                resource_path.split("/"),
-                folder
-            )
+            simple_path = get_path_parsed(resource_path.split("/"), folder)
             write_side_image(
                 size_side,
                 {
                     TemplatePathKeys.BASE: simple_path,
-                    TemplatePathKeys.NAME: simple_path.split("/", 1)[1].split("/")[-1]
-                }
+                    TemplatePathKeys.NAME: simple_path.split("/", 1)[1].split("/")[-1],
+                },
             )
-        
-        #use_side = write_side_image(size_side, load_util)
 
     _path: Path = origin
-    abbr = get_name_acron(origin=origin)
+    abbr = get_name_acron(origin=origin) if kind == "image" else "etc"
     if abbr == "":
         abbr = "rdnd"
     # HACK: this might be more a TODO than a HACK, but somebody
@@ -1693,6 +1708,130 @@ def write_common_file(
         ).writelines(lines)
         print("Common created in ", origin)
 
+
+def write_names(sprites: Path = Path("."), chapters: Path = Path(".")):
+
+    #get each character's aliases
+    folders = get_list_system_dirs(sprites, "dir")
+    alias = []
+    for folder in folders:
+        alias.append( get_name_acron(origin=(sprites / folder)) )
+
+    lines_used = scan_lines_chapters(alias, chapters)
+    lines_origin = scan_lines_common(chapters)
+    
+    #used to query where the files come from
+    engine_origin = SearchEngine(
+        Schema(
+            path_simple=TEXT(stored=True), 
+            path_str=TEXT(stored=True),
+            name=TEXT(stored=True), 
+            whole=TEXT(stored=True), 
+            path_whole=TEXT(stored=True)
+        )
+    )
+    #used to query where the files are being used
+    engine_useded = SearchEngine(
+        Schema(
+            field=TEXT(stored=True), 
+            file =TEXT(stored=True), 
+            where=TEXT(stored=True),
+        )
+    )
+    
+    origin_base = []
+    #parse the origin info into something woosh can use
+    for folder, common in lines_origin.items():
+        # path, name, whole, path (whole)
+        for line in common:
+            s_line = line.replace("\n", "")
+            if len(s_line.replace(" ", "")) == 0:
+                continue
+            path = line.split("=", 1)[1].split("\"", 1)[1].split("\"", 1)[0]
+            origin_base.append(
+                {
+                    "path_simple": path,
+                    "path_str": " ".join(path.split("/")),
+                    "name": line.split("=", 1)[0].split(" ", 1)[1].replace("_", " "),
+                    "whole": line,
+                    "path_whole": folder.as_posix()
+                }
+            )
+    useded_base = []
+    for file, field in lines_used.items():
+        
+        for zone, use in field.items():
+            
+            for s_use in list(use.keys()):
+                useded_base.append(
+                    {
+                        "field": zone,
+                        "file" : file,
+                        "where": s_use
+                    }
+                )
+    
+    engine_origin.index_documents(origin_base)
+    engine_useded.index_documents(useded_base)
+    
+    to_change: dict[str, tuple[str, str, str]] = {}
+    print(Fore.RED + "AFTER YOU END THIS PROCCES, THE CHANGES WILL BE APPLIED"+Fore.RESET)
+    while True:
+        
+        result = engine_origin.query(
+            input("Insert a name or its path\n>..."),
+            ["name", "path_simple", "path_str"],
+            False
+        )
+        
+        if len(result) != 0:
+            print("Use -1 to cancel this query")
+            print("ID <--------> INFO")
+            for _id, info in zip(range(len(result)), result):
+                print("Given the ID" + Fore.GREEN + f" {_id}" + Fore.RESET + ":" +f"\
+                    \nDefinition used: {info["name"]} \
+                    \nPath used: {info["path_simple"]} \n"
+                )
+
+            try:
+                _id = int(input("Insert ID to modify\n>..."))
+            except (ValueError, TypeError):
+                _id = -1
+            
+            if _id < 0 or _id > len(result):
+                continue
+            
+            info = result[_id]
+            
+            print("Actual file name: "+ Fore.BLUE + f"{info["path_simple"].split("/")[-1]}" + Fore.RESET + "\n")
+            new_name = input("Insert the new " + Fore.RED + "file name" + Fore.RESET + ", just the name, not the extension\n>...")
+            to_change[info["name"]] = ( # [file] 
+                new_name,            # file
+                info["path_simple"], # game/images/Sprites/ailstair/[file].png
+                info["whole"]        # define [file] = [path]
+            )
+        else:
+            print("nothing found!")
+            
+        if not input("Continue making querys?\n") in ["y", "yes"]:
+            break
+    
+    return
+    #TODO: here should be more code.... idk
+    print("")
+    print(useded_base)
+    
+    for name, info in to_change.items():
+        
+        results = engine_useded.query(
+            name,
+            [ "where" ],
+            False
+        )
+        
+        print(results)
+    
+    print(to_change)
 
 ########################################################
 #
@@ -1803,7 +1942,11 @@ def mkr_lines_list(
             anima_key = is_animated_name(group)
 
             # animation special
-            if can_procces_animations and anima_key == key and isinstance(FORMATS_IMPORTED[key], list):
+            if (
+                can_procces_animations
+                and anima_key == key
+                and isinstance(FORMATS_IMPORTED[key], list)
+            ):
                 is_animation = FORMATS_IMPORTED[key][0]
                 if is_animation == True:
                     _0 = []
@@ -1865,22 +2008,387 @@ def mkr_lines_list(
     return lines
 
 
-write_common_file(
-    [
-        ParseKeywords.FOLDER,
-        ProccesKeywords.ALL,
-        ProccesKeywords.ANIMATED,
-        ProccesKeywords.SUBFOLDER,
-        ProccesKeywords.SIDE,
-        
-        TemplateKeys.ANIMATED_BLINK_NORMAL,
-        TemplateKeys.ANIMATED_ANIMATED_BODY,
-        TemplateKeys.SIDE,
-        TemplateKeys.NORMAL,
-        TemplateKeys.FLIPED,
-        
-        ImportKeywords.IMAGES,
-    ],
-    None,
-    Path("./images/Sprites/ailstair"),
-)
+IMAGE_KEYWORDS: list[str] = ["scene", "show", "hide"]
+SOUND_KEYWORDS: list[str] = ["play"]
+
+
+def scan_lines_chapters(
+    aliases: list[str], origin: Path = Path(".")
+) -> dict[str, dict[str, dict[str, list[int]]]]:
+
+    files = get_list_file_extended(RESERVED_GENERIC_CREA_EXTEN, origin=origin)
+    all_files_usage = {}
+
+    for file in files:
+        s_file = file.split(".")[0]
+        all_files_usage[s_file] = {}
+
+        for _ in ["image", "video", "sound"]:
+            all_files_usage[s_file][_] = {}
+
+        c_l = 0
+        for line in open(origin / file, "r", encoding="utf-8").readlines():
+            s_line = line.replace("\n", "")
+            c_l += 1
+            if len(s_line.replace(" ", "")) == 0:
+                continue
+
+            c_s = 0
+            while s_line[c_s] == " ":
+                c_s += 1
+            s_line = s_line[c_s:]
+
+            field = ""
+            match s_line.split(" ")[0]:
+                case x if x in aliases + IMAGE_KEYWORDS:
+                    field = "image"
+                case x if x in SOUND_KEYWORDS:
+                    field = "sound"
+
+            if field == "":
+                continue
+
+            if not s_line in all_files_usage[s_file]:
+                all_files_usage[s_file][field][s_line] = []
+
+            all_files_usage[s_file][field][s_line].append(c_l)
+
+    return all_files_usage
+
+
+def scan_lines_common(origin: Path = Path(".")) -> dict[Path, list[str]]:
+    all_files_usage = {}
+    folders = get_list_subfolders(origin)
+    # get all folders that have a common.rpy file
+    for folder in folders.copy():
+        if (
+            len(
+                get_list_files(
+                    RESERVED_GENERIC_CREA_NAMES,
+                    [RESERVED_GENERIC_CREA_EXTEN],
+                    False,
+                    origin=folder,
+                )
+            )
+            == 0
+        ):
+            folders.remove(folder)
+
+    # get its contents
+    for folder in folders:
+        #s_folder = folder.as_posix().split("/")[-1]
+
+        all_files_usage[folder] = open(
+            folder
+            / (RESERVED_GENERIC_CREA_NAMES[0] + "." + RESERVED_GENERIC_CREA_EXTEN),
+            "r",
+            encoding="utf-8",
+        ).readlines()
+
+    return all_files_usage
+
+########################################################
+#
+# Import specific related zone (useless)
+#
+########################################################
+def _aux_import_(is_audio: bool, origin: Path = Path("."), single: bool = False):
+    folders: list[str] = []
+    if single:
+        folders.append(origin)
+    else:
+        folders.extend(get_list_system_file("dir", origin=origin))
+
+    for folder in folders:
+        write_common_file(
+            [
+                ParseKeywords.FOLDER,
+                ProccesKeywords.SUBFOLDER,
+                ProccesKeywords.NOTHING,
+                TemplateKeys.SOUND if is_audio else TemplateKeys.VIDEO,
+                ImportKeywords.SOUNDS if is_audio else ImportKeywords.VIDEOS,
+            ],
+            None,
+            folder,
+        )
+
+
+def import_audio(origin: Path = Path("."), single: bool = False):
+    _aux_import_(True, origin, single)
+
+
+def import_video(origin: Path = Path("."), single: bool = False):
+    _aux_import_(False, origin, single)
+
+
+# generic function
+def import_backgrounds(origin: Path = Path(".")):
+    folders: list[str] = [origin]
+    folders.extend(get_list_system_file("dir", origin=origin))
+
+    for folder in folders:
+        write_common_file(
+            [
+                ParseKeywords.FOLDER,
+                ProccesKeywords.SUBFOLDER,
+                ProccesKeywords.NOTHING,
+                TemplateKeys.SCALE,
+                ImportKeywords.IMAGES,
+            ],
+            None,
+            folder,
+        )
+
+
+# specific function
+def import_sprites(origin: Path = Path("."), single: bool = False):
+    folders: list[str] = []
+    if single:
+        folders.append(origin)
+    else:
+        folders.extend(get_list_subfolders(origin=origin))
+
+    for folder in folders:
+        info = None
+        if (Path(folder) / RequiredFiles.INFO).exists():
+            info = ConfigParser()
+            if len(info.read(Path(folder) / RequiredFiles.INFO, "utf-8")) == 0:
+                info = None
+
+        write_common_file(
+            [
+                ParseKeywords.FILE,
+                ProccesKeywords.ANIMATED,
+                ProccesKeywords.SIDE,
+                TemplateKeys.ANIMATED_BLINK_NORMAL,
+                TemplateKeys.ANIMATED_ANIMATED_BODY,
+                TemplateKeys.SIDE,
+                TemplateKeys.NORMAL,
+                ImportKeywords.IMAGES,
+            ],
+            info,
+            folder,
+        )
+
+
+def handler():
+    pass
+
+def given_path(path: str) -> Path:
+    _ = Path(path).resolve()
+    if not _.exists():
+        raise ValueError
+    return _
+
+def frame():
+    # TODO: add translations
+    parser.add_argument(
+        "-a",
+        "--authors",
+        action="version",
+        version="Thanks to "
+        + mkr_str(__author__ if isinstance(__author__, list) else [__author__], ", ")
+        + " for make this "
+        + __product__
+        + " possible!",
+        help="Show the authors that made this version",
+    )
+
+    parser.add_argument(
+        "-v",
+        "--version",
+        action="version",
+        version="%(prog)s " + __version__
+    )
+
+    parser.add_argument(
+        "--set-assets",
+        "-s-ass", #yes... I want ass
+        action="store",
+        help="Set the main folder to look for assets within the proyect",
+        default=Path("."),
+        metavar="path",
+        dest="paths",
+        type=given_path,
+        required=True
+    )
+
+    parser.add_argument(
+        "--set-audio",
+        "-s-audio",
+        action="store",
+        help="Set the audio's folder path",
+        default= Path("./game/" + DEFAULT_PATH_SOUND % {"base": DEFAULT_RESOURCE_PATH}),
+        metavar="path",
+        dest="paths",
+        type=given_path
+    )
+
+    parser.add_argument(
+        "--set-video",
+        "-s-video",
+        action="store",
+        help="Set the video's folder path",
+        default= Path("./game/" + DEFAULT_PATH_VIDEO % {"base": DEFAULT_RESOURCE_PATH}),
+        metavar="path",
+        dest="paths",
+        type=given_path
+    )
+
+    parser.add_argument(
+        "--set-sprite",
+        "-s-sprite",
+        action="store",
+        help="Set the sprite's folder path",
+        default= Path("./game/" + DEFAULT_PATH_IMAGE % {"base": DEFAULT_RESOURCE_PATH} + "/characters"),
+        metavar="path",
+        dest="paths",
+        type=given_path
+    )
+    
+    parser.add_argument(
+        "--set-background",
+        "-s-background",
+        action="store",
+        help="Set the background's folder path",
+        default= Path("./game/" + DEFAULT_PATH_IMAGE % {"base": DEFAULT_RESOURCE_PATH} + "/world"),
+        metavar="path",
+        dest="paths",
+        type=given_path
+    )
+
+    parser.add_argument(
+        "--set-language",
+        "-s-lang",
+        action="store",
+        help="Set the actual language for the session",
+        default=os_language,
+        choices=list(languages.keys()),
+        type=str
+    )
+
+    ###########################
+    #
+    # Features group
+    #
+    ###########################
+
+    features_group = parser.add_argument_group(
+        "Features", 
+        "These commands will control how your session behave and respond to differents scenes"
+    )
+
+    if has_feature(FeaturesKeywords.IMAGE_CREATION):
+        features_group.add_argument(
+            "--enable-side",
+            "-n-sides",
+            action="store_true",
+            help="enable side variants generation",
+            default=False,
+        )
+
+    features_group.add_argument(
+        "--enable-common",
+        "-n-common",
+        action="store_true",
+        help="enable common file generation",
+        default=False,
+    )
+
+    if has_feature(FeaturesKeywords.RENAMING_PROCESS):
+        features_group.add_argument(
+            "--enable-renamer",
+            "-n-renamer",
+            action="store_true",
+            help="if enable, this will open a procces to rename files before create common.rpy files (useful in big proyects)",
+            default=False,
+            deprecated=True #just for now
+        )
+
+    if has_feature(FeaturesKeywords.ZIP_COMPRESSION):
+        features_group.add_argument(
+            "--enable-zip-compression",
+            "-n-compression",
+            action="store_true",
+            help="enable compression into a zip... you might use to make updates to the assets",
+            default=False,
+            deprecated=True #just for now
+        )
+
+    features_group.add_argument(
+        "--set-cipher-number",
+        "-s-cipher",
+        action="store",
+        help="if used, this will enable the assets encryption system, ensure you have our modded renpy SDK",
+        default=-1,
+        type=int,
+        deprecated=True
+    )
+
+    features_group.add_argument(
+        "--set-import-mode",
+        "-s-mode",
+        action="store",
+        help="set the import mode",
+        default="dev",
+        type=str,
+        choices=["zip", "source", "dev"],
+    )
+    
+    ###########################
+    #
+    # Skip group
+    #
+    ###########################
+    
+    skip_group = parser.add_argument_group(
+        "Skipper field", 
+        "These commands will add skips and exceptions when getting different resources"
+    )
+    
+    skip_group.add_argument(
+        "--skip-name",
+        "-s-name",
+        nargs="+",
+        help="Skip the names given (even if it is either file or folder)",
+        default=[],
+        metavar="names",
+        dest="skips"
+    )
+
+    skip_group.add_argument(
+        "--skip-file",
+        "-s-file",
+        nargs="+",
+        help="Skip the names given when files are scanned",
+        default=[],
+        metavar="names",
+        dest="skips"
+    )
+
+    skip_group.add_argument(
+        "--skip-folder",
+        "-s-folder",
+        nargs="+",
+        help="Skip the names given when folders are scanned",
+        default=[],
+        metavar="names",
+        dest="skips"
+    )
+
+    skip_group.add_argument(
+        "--skip-extension",
+        "-s-extension",
+        nargs="+",
+        help="Skip the extesions given",
+        default=[],
+        metavar="extension",
+        dest="skips"
+    )
+
+    args = parser.parse_args()
+
+
+if __name__ == "__main__":
+    frame()
+    parser.exit(__return__, __return_text__[__return__])
