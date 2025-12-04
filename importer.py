@@ -1649,12 +1649,11 @@ def write_common_file(
     if ProccesKeywords.SUBFOLDER in modes:
         folders += get_list_subfolders(origin)
     if has_feature(FeaturesKeywords.SIDE_GENERATION) and ProccesKeywords.SIDE in modes:
-
         use_side = True
         for folder in folders:
             if folder == "":
                 folder = origin
-            simple_path = get_path_parsed(resource_path.split("/"), folder)
+            simple_path = folder.as_posix()
             write_side_image(
                 size_side,
                 {
@@ -1724,7 +1723,7 @@ def write_common_file(
             / ("common_dist.py" if DEFAULT_KIND_IMPORT == "zip" else "common.rpy"),
             "w",
         ).writelines(lines)
-        print("Common created in ", origin)
+        print("Common created in ", origin, "\n")
 
 
 def write_names(sprites: Path = Path("."), game_data: Path = Path(".")):
@@ -2267,8 +2266,7 @@ def handler(origin: ArgumentsGiven):
             for n in files_to_rewrite:
                 open(game_data / (n + ".rpy"), "w" ).writelines(files_to_rewrite[n])
         
-    #2nd import (in case renamer was used, to ensure everything is fine)
-    if origin.can_generate_common:
+        #2nd import (in case renamer was used, to ensure everything is fine)
         import_all()
     
 
