@@ -1,6 +1,7 @@
 # error code
 # 1 -> mising important lib
 # 2 -> incorrect version
+# 3 -> unkwon error
 ########################################################
 #
 # Imports general zone
@@ -10,19 +11,20 @@ import sys
 import logging
 import warnings
 from platform import system
-from os import listdir, getcwd, remove
+from os import listdir, getcwd, remove, rename
 
 ########################################################
 #
 # Meta zone
 #
 ########################################################
-__version__ = "1.0.4.6-dev"
+__version__ = "1.0.5.0"
 __return__ = 0
 __return_text__ = [
     "completed",
     "missing library, check the logs",
-    "you have an unsupported python version"
+    "you have an unsupported python version",
+    "Unkwon error, check the logs"
 ]
 __product__ = "importer"
 __author__ = "Z3R0_GT"
@@ -57,7 +59,22 @@ if sys.version_info >= (3, 15):
         )
 
 from enum import IntEnum, StrEnum
-
+from collections import namedtuple
+ArgumentsGiven = namedtuple(
+    "ArgumentsGiven", 
+    [
+        "game",
+        "audio",
+        "video",
+        "sprite",
+        "background",
+        "can_generate_side",
+        "can_generate_common",
+        "use_renamer",
+        "use_cipher_zone",
+        "can_generate_zip",
+    ]
+)
 # NOTE: this import is here cuz the section 'Imports specifc zone' is after some code that needs this function working
 # We ignore 'locale.getdefaultlocale' warning
 warnings.filterwarnings("ignore", ".*is deprecated and slated for removal in.*")
@@ -77,7 +94,7 @@ from functools import singledispatch
 
 from pathlib import Path
 from subprocess import run
-from json import load, loads, dump, dumps
+from json import load, loads, dumps
 from configparser import ConfigParser
 
 ########################################################
@@ -491,8 +508,8 @@ DEFAULT_SIZE_CORP_VAR: tuple[int, int, int, int] = (675, 5, 1067, 480)
 DEFAULT_RESOURCE_PATH = "assets"
 
 DEFAULT_PATH_VIDEO = "%(base)s/video"  # base
-DEFAULT_PATH_SOUND = "%(base)s/sound"  # base
-DEFAULT_PATH_IMAGE = "%(base)s/image"  # base
+DEFAULT_PATH_SOUND = "%(base)s/audio"  # base
+DEFAULT_PATH_IMAGE = "%(base)s/images"  # base
 
 DEFAULT_PATH_SIDE = f"%({TemplatePathKeys.BASE})s/side"  # mostly for images
 
@@ -516,7 +533,7 @@ SKIP_SYMBOLS: list[str] = ["_"]
 SKIP_GEN_NAMES: list[str] = []
 SKIP_FILE_NAME: list[str] = ["gui", "options", "screens"]
 SKIP_FOL_NAMES: list[str] = ["gui", "credits", "logos", "fonts"]
-
+SKIP_EXTENSION: list[str] = []
 
 RESERVED_GENERIC_FILE_NAMES: tuple[str, str, str, str, str, str] = (
     "character",
@@ -880,14 +897,15 @@ def get_list_file_extended(
     local = (
         get_list_system_file("file", origin, is_normal) if len(local) == 0 else local
     )
-
+    
     @singledispatch
     def extend(extension: str) -> list[str]:
-        return [i for i in local if i[-len(extension) :] == extension]
+        return [i for i in local if i[-len(extension) :] in [extension] + SKIP_EXTENSION]
 
     @extend.register
     def _(extension: list) -> list[str]:
         a = []
+        extension += SKIP_EXTENSION #HACK
         for i in local:
             for n in extension:
                 if i[-len(n) :] in extension:
@@ -982,7 +1000,7 @@ def get_list_subfolders(
     folders = [
         origin / x for x in get_list_system_file("dir", origin) if not x in exclude
     ]
-    for x in folders.copy():
+    for x in folders:
 
         if x.resolve() == origin.resolve():
             continue
@@ -1040,9 +1058,9 @@ def get_path_parsed(start: str | list[str], origin: Path = Path(".")) -> str:
 
     if isinstance(start, str):
         start = [start]
-
+    
     return mkr_str(
-        normal if not dir_exits else normal[normal.index("/".join(start)) :], "/"
+        normal if not dir_exits else normal[normal.index(start[0]) :], "/"
     )
 
 
@@ -1630,7 +1648,6 @@ def write_common_file(
 
     if ProccesKeywords.SUBFOLDER in modes:
         folders += get_list_subfolders(origin)
-
     if has_feature(FeaturesKeywords.SIDE_GENERATION) and ProccesKeywords.SIDE in modes:
 
         use_side = True
@@ -1662,6 +1679,7 @@ def write_common_file(
         ]
     )
     lines = []
+    
     for folder in folders:
         if folder == "":
             _path /= "."
@@ -1671,7 +1689,7 @@ def write_common_file(
 
         if not _path.exists():
             continue
-
+        
         files = (
             get_list_file_extended(
                 extend, origin=_path, local=get_list_system_dirs(_path)
@@ -1709,7 +1727,7 @@ def write_common_file(
         print("Common created in ", origin)
 
 
-def write_names(sprites: Path = Path("."), chapters: Path = Path(".")):
+def write_names(sprites: Path = Path("."), game_data: Path = Path(".")):
 
     #get each character's aliases
     folders = get_list_system_dirs(sprites, "dir")
@@ -1717,9 +1735,9 @@ def write_names(sprites: Path = Path("."), chapters: Path = Path(".")):
     for folder in folders:
         alias.append( get_name_acron(origin=(sprites / folder)) )
 
-    lines_used = scan_lines_chapters(alias, chapters)
-    lines_origin = scan_lines_common(chapters)
-    
+    lines_used = scan_lines_chapters(alias, game_data)
+    lines_origin = scan_lines_common(game_data)
+
     #used to query where the files come from
     engine_origin = SearchEngine(
         Schema(
@@ -1745,9 +1763,14 @@ def write_names(sprites: Path = Path("."), chapters: Path = Path(".")):
         # path, name, whole, path (whole)
         for line in common:
             s_line = line.replace("\n", "")
-            if len(s_line.replace(" ", "")) == 0:
+            if len(s_line.replace(" ", "")) == 0 or line[0] == "#":
                 continue
-            path = line.split("=", 1)[1].split("\"", 1)[1].split("\"", 1)[0]
+            #TODO: make checks to ensure this shit have the correct format
+            try: 
+                path = line.split("=", 1)[1].split("\"", 1)[1].split("\"", 1)[0]
+            except IndexError:
+                continue
+            
             origin_base.append(
                 {
                     "path_simple": path,
@@ -1770,11 +1793,10 @@ def write_names(sprites: Path = Path("."), chapters: Path = Path(".")):
                         "where": s_use
                     }
                 )
-    
     engine_origin.index_documents(origin_base)
     engine_useded.index_documents(useded_base)
     
-    to_change: dict[str, tuple[str, str, str]] = {}
+    to_change: dict[str, tuple[str, str, str, int]] = {}
     print(Fore.RED + "AFTER YOU END THIS PROCCES, THE CHANGES WILL BE APPLIED"+Fore.RESET)
     while True:
         
@@ -1808,7 +1830,8 @@ def write_names(sprites: Path = Path("."), chapters: Path = Path(".")):
             to_change[info["name"]] = ( # [file] 
                 new_name,            # file
                 info["path_simple"], # game/images/Sprites/ailstair/[file].png
-                info["whole"]        # define [file] = [path]
+                info["path_whole"],  #Path to common (not include common.rpy itself)
+                lines_origin[Path(info["path_whole"])].index(info["whole"])  #line where it's located
             )
         else:
             print("nothing found!")
@@ -1816,22 +1839,25 @@ def write_names(sprites: Path = Path("."), chapters: Path = Path(".")):
         if not input("Continue making querys?\n") in ["y", "yes"]:
             break
     
-    return
-    #TODO: here should be more code.... idk
-    print("")
-    print(useded_base)
-    
-    for name, info in to_change.items():
+    if __can_edit__ and input(
+            "Are you 100% you want to rename " + str(len(to_change)) + " files?\
+            \n" + Fore.RED + "TIHS CAN'T BE UNDONE, ARE YOU SURE?" + Fore.RESET + "\n>..."
+        ) in ["yes", "y"]:
         
-        results = engine_useded.query(
-            name,
-            [ "where" ],
-            False
-        )
-        
-        print(results)
+        for values in to_change.values():
+            new = values[1].split("/")
+            new[-1] = values[0] + "." + new[-1].split(".")[-1]
+            new = "/".join(new)
+            print(f"The file {Fore.RED + values[1].split("/")[-1] + Fore.RESET} will be renamed to {Fore.RED + new.split("/")[-1] + Fore.RESET} in {values[1]}")
+            try:
+                rename(
+                    Path(values[1]).resolve(),
+                    Path(new)
+                )  
+            except Exception as e:
+                print(e)
     
-    print(to_change)
+    return engine_useded, to_change, lines_used
 
 ########################################################
 #
@@ -2093,10 +2119,8 @@ def scan_lines_common(origin: Path = Path(".")) -> dict[Path, list[str]]:
 #
 ########################################################
 def _aux_import_(is_audio: bool, origin: Path = Path("."), single: bool = False):
-    folders: list[str] = []
-    if single:
-        folders.append(origin)
-    else:
+    folders: list[str] = [ origin ]
+    if not single:
         folders.extend(get_list_system_file("dir", origin=origin))
 
     for folder in folders:
@@ -2124,7 +2148,7 @@ def import_video(origin: Path = Path("."), single: bool = False):
 # generic function
 def import_backgrounds(origin: Path = Path(".")):
     folders: list[str] = [origin]
-    folders.extend(get_list_system_file("dir", origin=origin))
+    folders.extend(get_list_subfolders(origin))
 
     for folder in folders:
         write_common_file(
@@ -2170,9 +2194,83 @@ def import_sprites(origin: Path = Path("."), single: bool = False):
             folder,
         )
 
+_default_audio = Path("./game/" + DEFAULT_PATH_SOUND % {"base": DEFAULT_RESOURCE_PATH})
+_default_video = Path("./game/" + DEFAULT_PATH_VIDEO % {"base": DEFAULT_RESOURCE_PATH})
+_default_sprite= Path("./game/" + DEFAULT_PATH_IMAGE % {"base": DEFAULT_RESOURCE_PATH} + "/characters")
+_default_background = Path("./game/" + DEFAULT_PATH_IMAGE % {"base": DEFAULT_RESOURCE_PATH} + "/world")
+def handler(origin: ArgumentsGiven):
+    game_data: Path = origin.game
+    _0 = {"base" : game_data / DEFAULT_RESOURCE_PATH }
+    
+    assets_info = ArgumentsGiven(
+        _0["base"],
+        Path(DEFAULT_PATH_SOUND % _0 if _default_audio == origin.audio else origin.audio),
+        Path(DEFAULT_PATH_VIDEO % _0 if _default_video == origin.video else origin.video),
+        Path((DEFAULT_PATH_IMAGE % _0) + "/characters" if _default_sprite == origin.sprite else origin.sprite) ,
+        Path((DEFAULT_PATH_IMAGE % _0) + "/world"      if _default_background == origin.background else origin.background),
+        None,
+        None,
+        None,
+        None,
+        None
+    )
+    
+    if origin.can_generate_side:
+        add_feature(FeaturesKeywords.SIDE_GENERATION)
+    
+    def import_all():
+        nonlocal assets_info
+        import_audio(assets_info.audio)
+        import_video(assets_info.video)
+        import_sprites(assets_info.sprite)
+        import_backgrounds(assets_info.background)
 
-def handler():
-    pass
+    change_handler = ()
+    if origin.use_renamer:
+        change_handler = write_names(assets_info.sprite, game_data)
+    
+    #1st import 
+    if origin.can_generate_common:
+        import_all()
+    
+    #renamer was used
+    if len(change_handler) != 0:
+        #here we compared all original date with the modded one
+        new_steps = scan_lines_common(game_data)
+        
+        actual_parts: list[tuple[str, str, str]] = []
+        #get the new name already parsed
+        for common in change_handler[1]:
+            common_path = Path(change_handler[1][common][2])
+            if common_path in new_steps:
+                actual_parts.append(
+                    (
+                        common[:-1].replace(" ", "_"),     # [file] old
+                        open(common_path / "common.rpy", "r").readlines()[change_handler[1][common][3]].split(" ",1)[1].split("=")[0][:-1], # [file] new
+                        get_name_acron(origin=common_path) #alias
+                    ) 
+                )
+        files_to_rewrite: dict[str, list[str]] = {}
+        for sector in actual_parts:
+            file: dict[Literal["field", "file", "where"], str]
+            for file in change_handler[0].query(sector[0], ["where"], False):
+                
+                if not file["file"] in files_to_rewrite:
+                    files_to_rewrite[file["file"]] = open(game_data / (file["file"] + ".rpy")).readlines()
+                
+                lines = change_handler[2][file["file"]][file["field"]][file["where"]]
+                
+                for n_line in lines:
+                    files_to_rewrite[file["file"]][n_line] = files_to_rewrite[file["file"]][n_line].replace(*[i.replace("_", " ").replace("side ", "").replace(" ", "_") for i in sector[:2]])
+
+        if __can_edit__:
+            for n in files_to_rewrite:
+                open(game_data / (n + ".rpy"), "w" ).writelines(files_to_rewrite[n])
+        
+    #2nd import (in case renamer was used, to ensure everything is fine)
+    if origin.can_generate_common:
+        import_all()
+    
 
 def given_path(path: str) -> Path:
     _ = Path(path).resolve()
@@ -2181,6 +2279,8 @@ def given_path(path: str) -> Path:
     return _
 
 def frame():
+    global __return__
+    logger.info("Starting phase 3: getting arguments")
     # TODO: add translations
     parser.add_argument(
         "-a",
@@ -2202,13 +2302,12 @@ def frame():
     )
 
     parser.add_argument(
-        "--set-assets",
+        "--set-game",
         "-s-ass", #yes... I want ass
         action="store",
         help="Set the main folder to look for assets within the proyect",
         default=Path("."),
         metavar="path",
-        dest="paths",
         type=given_path,
         required=True
     )
@@ -2218,9 +2317,8 @@ def frame():
         "-s-audio",
         action="store",
         help="Set the audio's folder path",
-        default= Path("./game/" + DEFAULT_PATH_SOUND % {"base": DEFAULT_RESOURCE_PATH}),
+        default= _default_audio,
         metavar="path",
-        dest="paths",
         type=given_path
     )
 
@@ -2229,9 +2327,8 @@ def frame():
         "-s-video",
         action="store",
         help="Set the video's folder path",
-        default= Path("./game/" + DEFAULT_PATH_VIDEO % {"base": DEFAULT_RESOURCE_PATH}),
+        default= _default_video,
         metavar="path",
-        dest="paths",
         type=given_path
     )
 
@@ -2240,9 +2337,8 @@ def frame():
         "-s-sprite",
         action="store",
         help="Set the sprite's folder path",
-        default= Path("./game/" + DEFAULT_PATH_IMAGE % {"base": DEFAULT_RESOURCE_PATH} + "/characters"),
+        default= _default_sprite,
         metavar="path",
-        dest="paths",
         type=given_path
     )
     
@@ -2251,9 +2347,8 @@ def frame():
         "-s-background",
         action="store",
         help="Set the background's folder path",
-        default= Path("./game/" + DEFAULT_PATH_IMAGE % {"base": DEFAULT_RESOURCE_PATH} + "/world"),
+        default= _default_background,
         metavar="path",
-        dest="paths",
         type=given_path
     )
 
@@ -2302,7 +2397,6 @@ def frame():
             action="store_true",
             help="if enable, this will open a procces to rename files before create common.rpy files (useful in big proyects)",
             default=False,
-            deprecated=True #just for now
         )
 
     if has_feature(FeaturesKeywords.ZIP_COMPRESSION):
@@ -2320,7 +2414,7 @@ def frame():
         "-s-cipher",
         action="store",
         help="if used, this will enable the assets encryption system, ensure you have our modded renpy SDK",
-        default=-1,
+        default=0,
         type=int,
         deprecated=True
     )
@@ -2352,8 +2446,7 @@ def frame():
         nargs="+",
         help="Skip the names given (even if it is either file or folder)",
         default=[],
-        metavar="names",
-        dest="skips"
+        metavar="names"
     )
 
     skip_group.add_argument(
@@ -2362,8 +2455,7 @@ def frame():
         nargs="+",
         help="Skip the names given when files are scanned",
         default=[],
-        metavar="names",
-        dest="skips"
+        metavar="names"
     )
 
     skip_group.add_argument(
@@ -2372,8 +2464,7 @@ def frame():
         nargs="+",
         help="Skip the names given when folders are scanned",
         default=[],
-        metavar="names",
-        dest="skips"
+        metavar="names"
     )
 
     skip_group.add_argument(
@@ -2382,12 +2473,48 @@ def frame():
         nargs="+",
         help="Skip the extesions given",
         default=[],
-        metavar="extension",
-        dest="skips"
+        metavar="extension"
     )
 
     args = parser.parse_args()
+    logger.info("Argument object: "+str(args))
+    logger.info("End phase 3: getting arguments")
 
+    logger.info("========PROGRAM STARED========")
+    SKIP_FILE_NAME.extend(
+        args.skip_file
+    )
+    SKIP_FOL_NAMES.extend(
+        args.skip_folder
+    )
+    SKIP_GEN_NAMES.extend(
+        args.skip_name
+    )
+    SKIP_EXTENSION.extend(
+        args.skip_extension
+    )
+    
+    global DEFAULT_KIND_IMPORT
+    DEFAULT_KIND_IMPORT = args.set_import_mode
+    try:
+        handler(
+            ArgumentsGiven(
+                args.set_game,
+                args.set_audio,
+                args.set_video,
+                args.set_sprite,
+                args.set_background,
+                args.enable_side,
+                args.enable_common,
+                args.enable_renamer,
+                args.set_cipher_number,
+                args.enable_zip_compression
+            )
+        )
+    except Exception as e:
+        logger.critical(e)
+        __return__ = 3
+    logger.info("========PROGRAM ENDED========")
 
 if __name__ == "__main__":
     frame()
