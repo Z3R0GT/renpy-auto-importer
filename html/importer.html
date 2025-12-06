@@ -1,0 +1,2563 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1">
+<meta name="generator" content="pdoc3 0.11.6">
+<title>importer API documentation</title>
+<meta name="description" content="This is a silly but useful tool to import stuff automatically in renpy, mostly designed to be
+customizable in most of the cases and save you some …">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/sanitize.min.css" integrity="sha512-y1dtMcuvtTMJc1yPgEqF0ZjQbhnc/bFhyvIyVNb9Zk5mIGtqVaAB1Ttl28su8AvFMOY0EwRbAe+HCLqj6W7/KA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/13.0.0/typography.min.css" integrity="sha512-Y1DYSb995BAfxobCkKepB1BqJJTPrOp3zPL74AWFugHHmmdcvO+C48WLrUOlhGMc0QG7AE3f7gmvvcrmX2fDoA==" crossorigin>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/default.min.css" crossorigin>
+<style>:root{--highlight-color:#fe9}.flex{display:flex !important}body{line-height:1.5em}#content{padding:20px}#sidebar{padding:1.5em;overflow:hidden}#sidebar > *:last-child{margin-bottom:2cm}.http-server-breadcrumbs{font-size:130%;margin:0 0 15px 0}#footer{font-size:.75em;padding:5px 30px;border-top:1px solid #ddd;text-align:right}#footer p{margin:0 0 0 1em;display:inline-block}#footer p:last-child{margin-right:30px}h1,h2,h3,h4,h5{font-weight:300}h1{font-size:2.5em;line-height:1.1em}h2{font-size:1.75em;margin:2em 0 .50em 0}h3{font-size:1.4em;margin:1.6em 0 .7em 0}h4{margin:0;font-size:105%}h1:target,h2:target,h3:target,h4:target,h5:target,h6:target{background:var(--highlight-color);padding:.2em 0}a{color:#058;text-decoration:none;transition:color .2s ease-in-out}a:visited{color:#503}a:hover{color:#b62}.title code{font-weight:bold}h2[id^="header-"]{margin-top:2em}.ident{color:#900;font-weight:bold}pre code{font-size:.8em;line-height:1.4em;padding:1em;display:block}code{background:#f3f3f3;font-family:"DejaVu Sans Mono",monospace;padding:1px 4px;overflow-wrap:break-word}h1 code{background:transparent}pre{border-top:1px solid #ccc;border-bottom:1px solid #ccc;margin:1em 0}#http-server-module-list{display:flex;flex-flow:column}#http-server-module-list div{display:flex}#http-server-module-list dt{min-width:10%}#http-server-module-list p{margin-top:0}.toc ul,#index{list-style-type:none;margin:0;padding:0}#index code{background:transparent}#index h3{border-bottom:1px solid #ddd}#index ul{padding:0}#index h4{margin-top:.6em;font-weight:bold}@media (min-width:200ex){#index .two-column{column-count:2}}@media (min-width:300ex){#index .two-column{column-count:3}}dl{margin-bottom:2em}dl dl:last-child{margin-bottom:4em}dd{margin:0 0 1em 3em}#header-classes + dl > dd{margin-bottom:3em}dd dd{margin-left:2em}dd p{margin:10px 0}.name{background:#eee;font-size:.85em;padding:5px 10px;display:inline-block;min-width:40%}.name:hover{background:#e0e0e0}dt:target .name{background:var(--highlight-color)}.name > span:first-child{white-space:nowrap}.name.class > span:nth-child(2){margin-left:.4em}.inherited{color:#999;border-left:5px solid #eee;padding-left:1em}.inheritance em{font-style:normal;font-weight:bold}.desc h2{font-weight:400;font-size:1.25em}.desc h3{font-size:1em}.desc dt code{background:inherit}.source > summary,.git-link-div{color:#666;text-align:right;font-weight:400;font-size:.8em;text-transform:uppercase}.source summary > *{white-space:nowrap;cursor:pointer}.git-link{color:inherit;margin-left:1em}.source pre{max-height:500px;overflow:auto;margin:0}.source pre code{font-size:12px;overflow:visible;min-width:max-content}.hlist{list-style:none}.hlist li{display:inline}.hlist li:after{content:',\2002'}.hlist li:last-child:after{content:none}.hlist .hlist{display:inline;padding-left:1em}img{max-width:100%}td{padding:0 .5em}.admonition{padding:.1em 1em;margin:1em 0}.admonition-title{font-weight:bold}.admonition.note,.admonition.info,.admonition.important{background:#aef}.admonition.todo,.admonition.versionadded,.admonition.tip,.admonition.hint{background:#dfd}.admonition.warning,.admonition.versionchanged,.admonition.deprecated{background:#fd4}.admonition.error,.admonition.danger,.admonition.caution{background:lightpink}</style>
+<style media="screen and (min-width: 700px)">@media screen and (min-width:700px){#sidebar{width:30%;height:100vh;overflow:auto;position:sticky;top:0}#content{width:70%;max-width:100ch;padding:3em 4em;border-left:1px solid #ddd}pre code{font-size:1em}.name{font-size:1em}main{display:flex;flex-direction:row-reverse;justify-content:flex-end}.toc ul ul,#index ul ul{padding-left:1em}.toc > ul > li{margin-top:.5em}}</style>
+<style media="print">@media print{#sidebar h1{page-break-before:always}.source{display:none}}@media print{*{background:transparent !important;color:#000 !important;box-shadow:none !important;text-shadow:none !important}a[href]:after{content:" (" attr(href) ")";font-size:90%}a[href][title]:after{content:none}abbr[title]:after{content:" (" attr(title) ")"}.ir a:after,a[href^="javascript:"]:after,a[href^="#"]:after{content:""}pre,blockquote{border:1px solid #999;page-break-inside:avoid}thead{display:table-header-group}tr,img{page-break-inside:avoid}img{max-width:100% !important}@page{margin:0.5cm}p,h2,h3{orphans:3;widows:3}h1,h2,h3,h4,h5,h6{page-break-after:avoid}}</style>
+<script defer src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" integrity="sha512-D9gUyxqja7hBtkWpPWGt9wfbfaMGVt9gnyCvYa+jojwwPHLCzUm5i8rpk7vD7wNee9bA35eYIjobYPaQuKS1MQ==" crossorigin></script>
+<script>window.addEventListener('DOMContentLoaded', () => {
+hljs.configure({languages: ['bash', 'css', 'diff', 'graphql', 'ini', 'javascript', 'json', 'plaintext', 'python', 'python-repl', 'rust', 'shell', 'sql', 'typescript', 'xml', 'yaml']});
+hljs.highlightAll();
+/* Collapse source docstrings */
+setTimeout(() => {
+[...document.querySelectorAll('.hljs.language-python > .hljs-string')]
+.filter(el => el.innerHTML.length > 200 && ['"""', "'''"].includes(el.innerHTML.substring(0, 3)))
+.forEach(el => {
+let d = document.createElement('details');
+d.classList.add('hljs-string');
+d.innerHTML = '<summary>"""</summary>' + el.innerHTML.substring(3);
+el.replaceWith(d);
+});
+}, 100);
+})</script>
+</head>
+<body>
+<main>
+<article id="content">
+<header>
+<h1 class="title">Module <code>importer</code></h1>
+</header>
+<section id="section-intro">
+<p>This is a silly but useful tool to import stuff automatically in renpy, mostly designed to be
+customizable in most of the cases and save you some time renaming and moving files/folder
+in your game, horiented for large game with a bunch of files&hellip; </p>
+<p>this is mostly a CLI tool, but it can also be used as an external lib&hellip; most of the times</p>
+<p>check each function docs and study their behavior as you want, it's not like I can't do much about it</p>
+<p>just hope you like it and give me a star in <a href="https://github.com/Z3R0GT/renpy-auto-importer">github</a>&hellip; and since you are there, follow me!</p>
+<p><br><br></p>
+<center>Tool originally made by Z3R0_GT, in representation of ScoStudios for
+RITF (Roses In The Flames&trade;), made by DragonForge Studios LLC. </center>
+<h1 id="how-to-use-easy-tutorial">How to use (easy tutorial)</h1>
+<h2 id="setup">Setup</h2>
+<ol>
+<li>download the tool and place in the folder relative to <code>./game</code> (or basically in your renpy game's proyect)</li>
+<li>ensure you have python between 3.13 and 3.14 (since one of our core functions only exits in 3.14 and low versions
+but it was marked for removal in 3.15, and its alternative sucks) </li>
+<li>install <a href="https://pypi.org/project/typing-extensions/">typing_extensions</a>, since it one of our main <a href="#dependencies">dependencies</a></li>
+<li>once installed, you are ready to go the next section</li>
+</ol>
+<h2 id="basic-commands">Basic commands</h2>
+<p>if you follow the <a href="#folder-structure">folder structure</a>, you should only use</p>
+<pre><code class="language-shell">$ python importer.py --set-game ./game --enable-common
+</code></pre>
+<p>otherwise, you should check the <a href="#commands">commands</a> section, or just use </p>
+<pre><code class="language-shell">$ python importer.py -h
+</code></pre>
+<p>to get more info about commands, since the <a href="#commands">commands</a> only covers case-of-use, but it doesn't actually explains why
+the commands, we consider their names are very explicit</p>
+<h1 id="details">Details</h1>
+<p><strong>Compilation</strong> (recommend for windows): auto-py-to-exe &gt;= 2.45.1</p>
+<p><strong>Python</strong>: </p>
+<blockquote>
+<p>Originally 3.13.2 (Microsoft store)</p>
+<p>This version was created with 3.14.0t (yes, free threads)</p>
+</blockquote>
+<p><strong>Code structure</strong>:</p>
+<blockquote>
+<p>Main imports</p>
+<p>Metadata related</p>
+<p>Enums</p>
+<p>Language service</p>
+<p>Secundary / optional imports</p>
+<p>Constants</p>
+<p>Functions</p>
+<blockquote>
+<p>Utils</p>
+<p>Path realted</p>
+<p>Specifics 1</p>
+<p>Writers</p>
+<p>Specifics 2 (now it's personal)</p>
+<blockquote>
+<p>Scanners</p>
+</blockquote>
+<p>Imports</p>
+<p>Entry point</p>
+</blockquote>
+</blockquote>
+<p><strong>Code</strong>: single file</p>
+<p><strong>Docummentation</strong>: <a href="https://pypi.org/project/pdoc3/">pydoc3</a> &gt;= 0.11.6</p>
+<h1 id="depencencies">Depencencies</h1>
+<blockquote>
+<p>Third-party libs</p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>name</th>
+<th style="text-align: center;">version</th>
+<th style="text-align: center;">is optional?</th>
+<th>why?</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="https://pypi.org/project/colorama/">colorama</a></td>
+<td style="text-align: center;">&gt;= 0.4.6</td>
+<td style="text-align: center;">✅</td>
+<td>just to get colors to the console</td>
+</tr>
+<tr>
+<td><a href="https://pypi.org/project/pillow/">pillow</a></td>
+<td style="text-align: center;">&gt;= 12.0.0</td>
+<td style="text-align: center;">✅</td>
+<td>to create side images</td>
+</tr>
+<tr>
+<td><a href="https://pypi.org/project/platformdirs/">platformdirs</a></td>
+<td style="text-align: center;">== 4.5.0</td>
+<td style="text-align: center;">✅</td>
+<td>to get the equivalent to appdata folder in many OS as possible</td>
+</tr>
+<tr>
+<td><a href="https://pypi.org/project/pyminizip/">pyminizip</a></td>
+<td style="text-align: center;">&gt;= 0.2.6</td>
+<td style="text-align: center;">✅</td>
+<td>to create zip file using a single function</td>
+</tr>
+<tr>
+<td><a href="https://pypi.org/project/tqdm/">tqdm</a></td>
+<td style="text-align: center;">&gt;= 4.67.1</td>
+<td style="text-align: center;">✅</td>
+<td>same as colorama, but for lists</td>
+</tr>
+<tr>
+<td><a href="https://pypi.org/project/typing-extensions/">typing_extensions</a></td>
+<td style="text-align: center;">&gt;= 4.15.0</td>
+<td style="text-align: center;">❌</td>
+<td>typing..........</td>
+</tr>
+<tr>
+<td><a href="https://pypi.org/project/Whoosh/">Whoosh</a></td>
+<td style="text-align: center;">&gt;= 2.7.4</td>
+<td style="text-align: center;">✅</td>
+<td>weight light search engine</td>
+</tr>
+<tr>
+<td><a href="https://pypi.org/project/pdoc3/">pydoc3</a></td>
+<td style="text-align: center;">&gt;= 0.11.6</td>
+<td style="text-align: center;">✅</td>
+<td>to create this doc</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>Python build-in (from 3.13.2 to 3.14.0t)</p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>name</th>
+<th>version</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>sys</td>
+<td>(build-in)</td>
+</tr>
+<tr>
+<td>logging</td>
+<td>(build-in)</td>
+</tr>
+<tr>
+<td>warnings</td>
+<td>(build-in)</td>
+</tr>
+<tr>
+<td>plataform</td>
+<td>(build-in)</td>
+</tr>
+<tr>
+<td>os</td>
+<td>(build-in)</td>
+</tr>
+<tr>
+<td>enum</td>
+<td>(build-in)</td>
+</tr>
+<tr>
+<td>collections</td>
+<td>(build-in)</td>
+</tr>
+<tr>
+<td>locale</td>
+<td>(build-in)</td>
+</tr>
+<tr>
+<td>argparse</td>
+<td>(build-in)</td>
+</tr>
+<tr>
+<td>shutil</td>
+<td>(build-in)</td>
+</tr>
+<tr>
+<td>functools</td>
+<td>(build-in)</td>
+</tr>
+<tr>
+<td>pathlib</td>
+<td>(build-in)</td>
+</tr>
+<tr>
+<td>json</td>
+<td>(build-in)</td>
+</tr>
+<tr>
+<td>configparser</td>
+<td>(build-in)</td>
+</tr>
+</tbody>
+</table>
+<h1 id="naming">Naming</h1>
+<p>Due to the design of the following code, the following variables are designated for naming and/or modifying the structure.
+This was designed to be "portable" and based on the "black box" concept (you have an input and an output, but you don't know what happens inside).
+Therefore, any function must follow the following "rules," and there are exceptions to these.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Every function or class must specify the expected data type and the returned data type, always</p>
+</div>
+<blockquote>
+<ul>
+<li>
+<h3 id="get-functions"><strong>GET</strong> Functions</h3>
+</li>
+</ul>
+<blockquote>
+<p>These functions should be as small as possible. If two or more of these functions are related in their operation, then they should share as much size as possible. Generally, they should get:</p>
+<p><code>get_{kind}_{what it does}_{where or how}</code></p>
+<p>Generally, a getter function should only have a minimum of two of these parts and no more.
+Exceptions to this rule are functions whose purpose is very simple or whose operation is literally defined by the function's name.</p>
+</blockquote>
+<ul>
+<li>
+<h3 id="mkr-functions"><strong>MKR</strong> Functions</h3>
+</li>
+</ul>
+<blockquote>
+<p>These are functions whose purpose is to "create" something within the machine, whether it's manipulating files or directories. They generally have 2 or 3 words (maximum-minimum) following the structure below:</p>
+<p><code>mkr_{what}_{type}</code></p>
+</blockquote>
+<ul>
+<li>
+<h3 id="functions-adddelrmsaveload">Functions <strong>ADD/DEL/RM/SAVE/LOAD</strong></h3>
+</li>
+</ul>
+<blockquote>
+<p>These are actually extra functions whose names cannot exceed two words and must be specific to their function.
+The documentation for these functions MUST be shorter and simpler, as they are extra.</p>
+</blockquote>
+<ul>
+<li>
+<h3 id="import-functions"><strong>IMPORT</strong> Functions</h3>
+</li>
+</ul>
+<blockquote>
+<p>most of the time, these function are mean to be shortcuts for all other functions, calling
+of these is the equivalent to do a proccess, since behind, these function automatically fullfill
+all possible requirements for a procces to be made</p>
+</blockquote>
+<ul>
+<li>
+<h3 id="scan-functions"><strong>SCAN</strong> Functions</h3>
+</li>
+</ul>
+<blockquote>
+<p>basically, the only job of this kind of functions is to scan something, search for patterns, and
+return what they found, their structure consists of:</p>
+<p><code>scan_{what or type}_{where or how}</code></p>
+<p>just like <a href="#get-functions">get functions</a>, there might be exception to this rule</p>
+</blockquote>
+<ul>
+<li>
+<h3 id="write-functions"><strong>WRITE</strong> Functions</h3>
+</li>
+</ul>
+<blockquote>
+<p>these function can't do much, other than recollect data and print/save into a file, most of the times
+their objective should gather the requiriments for other functions be done and check their viability before perform
+any procces</p>
+</blockquote>
+<ul>
+<li>
+<h3 id="other-functions">Other Functions</h3>
+</li>
+</ul>
+<blockquote>
+<p>Most functions are already covered. You can add more if you wish, but you must update this header to keep the documentation current.</p>
+</blockquote>
+</blockquote>
+<h1 id="folder-structure">Folder structure</h1>
+<p>First of all, this tool was designed to be effort-less for beginers to use, to this might be something we would like game that use this tool to implement
+as their own folder structure</p>
+<p>so, renpy basically have all their game in the folder with same name (./game), which we call <code>game data</code>, where all <strong>chapters</strong> (renpy files were the story
+takes place) and assets are placed, we believe in a folder structure similar to some games, where:</p>
+<p>every asset will go to an <strong>assets</strong> folder (<code><a title="importer.DEFAULT_RESOURCE_PATH" href="#importer.DEFAULT_RESOURCE_PATH">DEFAULT_RESOURCE_PATH</a></code>), where all of them are saved in different folders, such as </p>
+<ol>
+<li>audio (<code><a title="importer.DEFAULT_PATH_SOUND" href="#importer.DEFAULT_PATH_SOUND">DEFAULT_PATH_SOUND</a></code>)</li>
+<li>video (<code><a title="importer.DEFAULT_PATH_VIDEO" href="#importer.DEFAULT_PATH_VIDEO">DEFAULT_PATH_VIDEO</a></code>)</li>
+<li>images (<code><a title="importer.DEFAULT_PATH_IMAGE" href="#importer.DEFAULT_PATH_IMAGE">DEFAULT_PATH_IMAGE</a></code>)</li>
+<li>fonts</li>
+<li>etc</li>
+</ol>
+<p>if you do something like</p>
+<pre><code>game/
+|   |
+|   | assets/
+|   |       |
+|   |       | audio/
+|   |       |      | folder A
+|   |       |      | folder B
+|   |       |      | folder C
+|   |       |      | my_song.mp3
+|   |       |      | my_song.wav
+|   |       | video/
+|   |       |      | folder A
+|   |       |      | folder B
+|   |       |      | folder C
+|   |       |      | my_video.mp4
+|   |       |      | my_song.ogv
+</code></pre>
+<p>the tool will work automatically to import the files for you, you don't need to specify <code>--set-audio</code> or <code>--set-video</code> for the path, since (as mention before),
+they are already declared (you can change them later if ya want, but that might require you to change the script)</p>
+<p><strong>but</strong>, there's a detail about background and sprites, due how they are organized and how different they are between games,
+we separate them into their own commands (<code>--set-sprite</code> and <code>--set-background</code> to be precise), yet, the same can apply, given us
+something like:</p>
+<pre><code>game/
+|   |
+|   | assets/
+|   |       |
+|   |       | images/
+|   |       |      | characters/
+|   |       |      |           |
+|   |       |      |           | character folder A
+|   |       |      |           | character folder B
+|   |       |      |           | character folder C
+|   |       |      | background/
+|   |       |      |           |
+|   |       |      |           | background folder A
+|   |       |      |           | background folder B
+|   |       |      |           | background folder C
+</code></pre>
+<p>ended up being something like this when using the whole folder structure</p>
+<pre><code>game/
+|   |
+|   | assets/
+|   |       |
+|   |       | audio/
+|   |       |      | folder A
+|   |       |      | folder B
+|   |       |      | folder C
+|   |       |      | my_song.mp3
+|   |       |      | my_song.wav
+|   |       | video/
+|   |       |      | folder A
+|   |       |      | folder B
+|   |       |      | folder C
+|   |       |      | my_video.mp4
+|   |       |      | my_song.ogv
+|   |       | images/
+|   |       |      | characters/
+|   |       |      |           |
+|   |       |      |           | character folder A /
+|   |       |      |           |                    |
+|   |       |      |           |                    | image A.png
+|   |       |      |           |                    | image B.png
+|   |       |      |           | character folder B
+|   |       |      |           | character folder C
+|   |       |      | background/
+|   |       |      |           |
+|   |       |      |           | background folder A /
+|   |       |      |           |                     |
+|   |       |      |           |                     | image A.png
+|   |       |      |           |                     | image B.png
+|   |       |      |           | background folder B
+|   |       |      |           | background folder C
+|   |       |fonts /
+|   |       |      | font A.ttf
+|   |       |      | font B.ttf
+|   |       |      | font C.ttf
+</code></pre>
+<p>and so, basically, using a structure like <code>./game/assets</code>, where <code>./game</code> is our setted game data folder (using <code>--set-game</code>) will
+make this whole procces more easy to use and for you even more organized if you are starting....</p>
+<p>yet, if your proyect already have certain structure, you might consider modify <code><a title="importer.DEFAULT_RESOURCE_PATH" href="#importer.DEFAULT_RESOURCE_PATH">DEFAULT_RESOURCE_PATH</a></code>, <code><a title="importer.DEFAULT_PATH_VIDEO" href="#importer.DEFAULT_PATH_VIDEO">DEFAULT_PATH_VIDEO</a></code>,
+<code><a title="importer.DEFAULT_PATH_SOUND" href="#importer.DEFAULT_PATH_SOUND">DEFAULT_PATH_SOUND</a></code> and <code><a title="importer.DEFAULT_PATH_IMAGE" href="#importer.DEFAULT_PATH_IMAGE">DEFAULT_PATH_IMAGE</a></code> to make the tool do something similar to the procces describe adove and make it more
+automated, or just use the <code>--set-[something]</code> commands to indicate that manually, it's up to you</p>
+<h1 id="commands">Commands</h1>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>better use <code>-h</code> or <code>--help</code> to get the full explanation of each command</p>
+</div>
+<pre><code class="language-shell">$ python importer.py -h
+</code></pre>
+<h2 id="cases">Cases</h2>
+<hr>
+<p><br>
+- Case 1: I want to use custom folders due how my proyect is structured</p>
+<pre><code class="language-shell">$ python importer.py -s-ass ./game -s-sprite ./game/image/sprites -s-background ./game/backgrounds --enable-common
+</code></pre>
+<p>here we are using <code>-s-sprite</code> and <code>-s-background</code> to set manually their folders, the same could be using the audio or video variants of <code>-s-[something]</code> command</p>
+<p>and don't forget about the <code>--enable-common</code> to create the common files</p>
+<p><br>
+- Case 2: I want to create side images, but no common files</p>
+<pre><code class="language-shell">$ python importer.py -s-ass ./game -s-sprite ./game/image/sprites -s-background ./game/backgrounds --enable-sides
+</code></pre>
+<p>and note that if you use both, <code>--enable-common</code> and <code>--enable-sides</code> this will first create the sides images and then create common file</p>
+<p><br>
+- Case 3: I want to rename some file and create common files after that</p>
+<pre><code class="language-shell">$ python importer.py -s-ass ./game -s-sprite ./game/image/sprites -s-background ./game/backgrounds --enable-common --enable-renamer
+</code></pre>
+<p>before even create the common file, the tool will enter into a simple interface asking you to provide the names, then select an option and
+confirm a new name for the file, once done, this will change <strong>ALL</strong> part where this image was used, this include audio, video, images, backgrounds, side variants and more!</p>
+<p>Once done, it will create the common file, even if you don't enable <code>--enable-common</code>, this is because once the file is renamed, there's no way for renpy be sure
+if this change was mode, so we really need that change be done, either if it's needed or not, so we make sure the changes are applied</p>
+<h1 id="error-codes">Error codes</h1>
+<p>Basically, if the tool is executed as a CLI (Command Line Interface), these commands will
+be what it will return being:</p>
+<ul>
+<li>0: Everything is good</li>
+<li>1: missing required lib/dependency</li>
+<li>2: incorrect python version</li>
+<li>3: unkwon error</li>
+</ul>
+<h1 id="changelog">Changelog</h1>
+<h3 id="17022025">17/02/2025</h3>
+<ul>
+<li>added more formats</li>
+<li>most of the code is documented and the tool is mostly funcionable</li>
+<li>almost production version</li>
+</ul>
+<h3 id="10032025">10/03/2025</h3>
+<ul>
+<li>added progress bars</li>
+<li>added new commands </li>
+<li>added new encryption functions</li>
+<li>added some eastern eggs</li>
+<li>fixed plataform dependencies and compatibility</li>
+<li>fixed minor bugs during compilation phase</li>
+<li>improve JSON import system and templates</li>
+<li>improve arguments parse function</li>
+<li>new search and import system</li>
+<li>code formatted under "black" formatting</li>
+<li>finish docummention</li>
+</ul>
+<h3 id="05122025">05/12/2025</h3>
+<ul>
+<li>added multiplataform support</li>
+<li>added a better logging system</li>
+<li>added new functions and template system</li>
+<li>added more validations about paths during the whole creation</li>
+<li>added a better configuration file</li>
+<li>added some self-made alternatives to some third party <a href="#depencencies">dependencies</a></li>
+<li>added enums to represent constant data within the tool</li>
+<li>added even more docs and external links for more info</li>
+<li>changed the <code><a title="importer.frame" href="#importer.frame">frame()</a></code> and <code><a title="importer.handler" href="#importer.handler">handler()</a></code> function to represent what the actual flow is</li>
+<li>changed the way the tool flow works</li>
+<li>changed the file structure </li>
+<li>changed the common.rpy workflow to make it more clear and stable</li>
+<li>improved language system (it still needs some minor improments, but it's the final version)</li>
+<li>improved importer and side generation system</li>
+<li>fixed some tricks to make <code>tqdm</code> works as expected</li>
+<li>fixed minor bugs due how side images were originally planned</li>
+<li>fixed some arguments bugs </li>
+<li>deleted all eastern eggs (for now)</li>
+<li>finally the searcher feature works properly (yet with some bugs due how the path is now handle)</li>
+</ul>
+<p>hope this maskes sence XD</p>
+</section>
+<section>
+</section>
+<section>
+<h2 class="section-title" id="header-variables">Global variables</h2>
+<dl>
+<dt id="importer.BUILDIN_ANIMATION_KEYS"><code class="name">var <span class="ident">BUILDIN_ANIMATION_KEYS</span> : dict[<a title="importer.TemplateKeys" href="#importer.TemplateKeys">TemplateKeys</a>, list[str]]</code></dt>
+<dd>
+<div class="desc"><h2 id="about">About</h2>
+<p>basically, this controlls when used some template based on their names (if includes some keywords or not)</p>
+<p>here we use a <code>key</code> to represent a template within <code><a title="importer.TemplateKeys" href="#importer.TemplateKeys">TemplateKeys</a></code>, and a <code>list[str]</code> to represent a collection of keywords that <code><a title="importer.is_animated_name" href="#importer.is_animated_name">is_animated_name()</a></code>
+will make use to indicate if it's animated or not</p></div>
+</dd>
+<dt id="importer.BUILDIN_FILE_TEMPLATES"><code class="name">var <span class="ident">BUILDIN_FILE_TEMPLATES</span> : dict[<a title="importer.TemplatePath" href="#importer.TemplatePath">TemplatePath</a>, str]</code></dt>
+<dd>
+<div class="desc"><h2 id="about">About</h2>
+<p>basically this defines how the <strong>file</strong> part of the template from <code><a title="importer.BUILDIN_TEMPLATES" href="#importer.BUILDIN_TEMPLATES">BUILDIN_TEMPLATES</a></code> or <code><a title="importer.FORMATS_IMPORTED" href="#importer.FORMATS_IMPORTED">FORMATS_IMPORTED</a></code> is using almost the same structure, but with differences</p>
+<p>which basically are adding certain keyword/extension extras to the file.</p>
+<div class="admonition todo">
+<p class="admonition-title">TODO</p>
+<p>make the function <code><a title="importer.get_name_template" href="#importer.get_name_template">get_name_template()</a></code> or once finished the 1st assets import validate the file using <code><a title="importer.handler" href="#importer.handler">handler()</a></code> (?)</p>
+</div>
+<h2 id="check-buildin_templates-in-their-keywords-section-to-know-about-how-the-format-works">check <code><a title="importer.BUILDIN_TEMPLATES" href="#importer.BUILDIN_TEMPLATES">BUILDIN_TEMPLATES</a></code>, in their "keywords" section to know about how the format works</h2>
+<h2 id="information-table">Information Table</h2>
+<hr>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Keyword</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">path</td>
+<td>the whole or simpliest path from a certain origin</td>
+</tr>
+<tr>
+<td style="text-align: left;">file</td>
+<td>the file that is being tested</td>
+</tr>
+</tbody>
+</table></div>
+</dd>
+<dt id="importer.BUILDIN_TEMPLATES"><code class="name">var <span class="ident">BUILDIN_TEMPLATES</span> : dict[<a title="importer.TemplateKeys" href="#importer.TemplateKeys">TemplateKeys</a> | str, str | list[str | bool | list[str]]]</code></dt>
+<dd>
+<div class="desc"><h2 id="about">About</h2>
+<p>This is one of the core variables for this tool, because it basically defines how the template for each <code><a title="importer.TemplateKeys" href="#importer.TemplateKeys">TemplateKeys</a></code> or new key should be</p>
+<h2 id="keywords">Keywords</h2>
+<p>how it works is basically using the % operator to replace more easily certain keywords, when the tool reach <code><a title="importer.mkr_lines_list" href="#importer.mkr_lines_list">mkr_lines_list()</a></code> function,
+based on what <code><a title="importer.write_names" href="#importer.write_names">write_names()</a></code> and the modes based on <code><a title="importer.TemplateKeys" href="#importer.TemplateKeys">TemplateKeys</a></code>, <code><a title="importer.ProccesKeywords" href="#importer.ProccesKeywords">ProccesKeywords</a></code>, <code><a title="importer.TemplatePathKeys" href="#importer.TemplatePathKeys">TemplatePathKeys</a></code> and <code><a title="importer.ParseKeywords" href="#importer.ParseKeywords">ParseKeywords</a></code> are configured,
+alongside with <code><a title="importer.FeaturesKeywords" href="#importer.FeaturesKeywords">FeaturesKeywords</a></code> and <code><a title="importer.ImportKeywords" href="#importer.ImportKeywords">ImportKeywords</a></code> configured, one or several templates will be used, we reserve the next ones
+seening in the information table, and also take a look at the examples, but take into account these are <strong>examples</strong> assuming certain
+configurations</p>
+<p>the real ones might be different from what is showed here, and each one of the next keyword must be used like the next example
+(and also this should the form that your custom templates might have):</p>
+<pre><code class="language-python">{
+    &quot;normal&quot; : 'image %(name)s = &quot;%(path)s&quot;\n'
+}
+</code></pre>
+<p>the example from adove is an extract from the default <code><a title="importer.BUILDIN_TEMPLATES" href="#importer.BUILDIN_TEMPLATES">BUILDIN_TEMPLATES</a></code> reference template, ofc your might be different</p>
+<p>and well&hellip; here is the information you might be looking for</p>
+<h2 id="information-table">Information Table</h2>
+<hr>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Keyword</th>
+<th style="text-align: left;">Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">name</td>
+<td style="text-align: left;">represents the most simple part of the file which is being parsed by <code><a title="importer.get_name_parsed" href="#importer.get_name_parsed">get_name_parsed()</a></code>
+<br><br></td>
+</tr>
+<tr>
+<td style="text-align: left;">path</td>
+<td style="text-align: left;">this is the easiest and most simple part of the path, this starts from <code><a title="importer.DEFAULT_RESOURCE_PATH" href="#importer.DEFAULT_RESOURCE_PATH">DEFAULT_RESOURCE_PATH</a></code> or <code><a title="importer.ArgumentsGiven.game" href="#importer.ArgumentsGiven.game">ArgumentsGiven.game</a></code> 'till the path's end, mostly they are parsed as posix (/) and then normalized by <code><a title="importer.get_path_parsed" href="#importer.get_path_parsed">get_path_parsed()</a></code> (under normal circunstance, check the <a href="#folder-structure">folder structure</a> for more info) <br><br></td>
+</tr>
+<tr>
+<td style="text-align: left;">size_scale</td>
+<td style="text-align: left;">this represent the target's screen deimension, this should a Heigh__x__width (<code><a title="importer.DEFAULT_SIZE_SCREEN" href="#importer.DEFAULT_SIZE_SCREEN">DEFAULT_SIZE_SCREEN</a></code>) or a <code>tuple[int, int]</code>, (anyway, they will parsed like the output says)
+<br><br></td>
+</tr>
+<tr>
+<td style="text-align: left;">size_side</td>
+<td style="text-align: left;">similar to the other, but this time represents the side's frame (<code><a title="importer.DEFAULT_SIZE_SIDE_VAR" href="#importer.DEFAULT_SIZE_SIDE_VAR">DEFAULT_SIZE_SIDE_VAR</a></code>)
+<br><br></td>
+</tr>
+<tr>
+<td style="text-align: left;">abbr</td>
+<td style="text-align: left;">this the short form of <strong>name</strong>, but, this will be created using the folder's name or character.rpy (mostly depends on <code><a title="importer.get_name_acron" href="#importer.get_name_acron">get_name_acron()</a></code>)
+<br><br></td>
+</tr>
+<tr>
+<td style="text-align: left;">file</td>
+<td style="text-align: left;">it's the same as path, but fixed with <code><a title="importer.TemplatePath" href="#importer.TemplatePath">TemplatePath</a></code>, which either case, might change depends on this last mode
+<br><br></td>
+</tr>
+<tr>
+<td style="text-align: left;">kind</td>
+<td style="text-align: left;">this feature depends on a modded SDK (which support the encription system), basically this repreent a literal value from <code><a title="importer.ImportKeywords" href="#importer.ImportKeywords">ImportKeywords</a></code>
+<br><br></td>
+</tr>
+<tr>
+<td style="text-align: left;">tab</td>
+<td style="text-align: left;">this is basically a <code>" " * DEFAULT_TAB</code> operation
+<br><br></td>
+</tr>
+</tbody>
+</table>
+<p>A bit of side note, when one of the values is a <code>list</code>, we don't know how to how to determine if it's an animated template, since a list might be also a non-animated template
+so, the first argument must always be <strong>True</strong> or <strong>False</strong> to indicate that, and if it is an animated template, it can use <code><a title="importer.ImageConfigValue.REPEAT" href="#importer.ImageConfigValue.REPEAT">ImageConfigValue.REPEAT</a></code> to enter into a
+loop to repeat certain statement, motly when dealing with multiple files</p>
+<div class="admonition caution">
+<p class="admonition-title">Caution</p>
+<p>most of their behavior depends on multiple variable, the examples of below were made considering the most simpliest
+flags, being <code><a title="importer.ParseKeywords.FILE" href="#importer.ParseKeywords.FILE">ParseKeywords.FILE</a></code>, <code><a title="importer.ImportKeywords.IMAGES" href="#importer.ImportKeywords.IMAGES">ImportKeywords.IMAGES</a></code> and <code><a title="importer.TemplatePath.NORMAL" href="#importer.TemplatePath.NORMAL">TemplatePath.NORMAL</a></code> in a <strong>sprite</strong> folder with a <code><a title="importer.DEFAULT_TAB" href="#importer.DEFAULT_TAB">DEFAULT_TAB</a></code> of <strong>4</strong></p>
+</div>
+<h2 id="example-table">Example Table</h2>
+<hr>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Keyword</th>
+<th>Input</th>
+<th style="text-align: center;">Output</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">name</td>
+<td>hello_world.png</td>
+<td style="text-align: center;">hello_world
+<br><br></td>
+</tr>
+<tr>
+<td style="text-align: left;">path</td>
+<td>C:/Users/[USER]/Desktop/awesome-game/game/assets/images/Sprites/Xellar</td>
+<td style="text-align: center;">assets/images/Sprites/Xellar
+<br><br></td>
+</tr>
+<tr>
+<td style="text-align: left;">size_scale</td>
+<td>1920x1080 or (1920, 1080)</td>
+<td style="text-align: center;">1920, 1080
+<br><br></td>
+</tr>
+<tr>
+<td style="text-align: left;">size_side</td>
+<td>300x350 or (300, 350)</td>
+<td style="text-align: center;">300, 350
+<br><br></td>
+</tr>
+<tr>
+<td style="text-align: left;">file</td>
+<td><strong><code><a title="importer.ArgumentsGiven.sprite" href="#importer.ArgumentsGiven.sprite">ArgumentsGiven.sprite</a></code></strong>/Xellar/xellar_normal.png <br><br></td>
+<td style="text-align: center;"><strong><code><a title="importer.ArgumentsGiven.sprite" href="#importer.ArgumentsGiven.sprite">ArgumentsGiven.sprite</a></code></strong>/Xellar/xellar_normal.png <br><br></td>
+</tr>
+<tr>
+<td style="text-align: left;">tab</td>
+<td>4</td>
+<td style="text-align: center;">"----"
+<br><br></td>
+</tr>
+</tbody>
+</table></div>
+</dd>
+<dt id="importer.DEFAULT_EXTEND_IMAGE_NOT_SUPPORT"><code class="name">var <span class="ident">DEFAULT_EXTEND_IMAGE_NOT_SUPPORT</span> : list[str]</code></dt>
+<dd>
+<div class="desc"><p>extension of file that are not actually supported (images this case), yet, this doesn't means renpy can't, check <a href="https://www.renpy.org/doc/html/displaying_images.html">the renpy docs</a></p></div>
+</dd>
+<dt id="importer.DEFAULT_EXTEND_IMAGE_SUPPORT"><code class="name">var <span class="ident">DEFAULT_EXTEND_IMAGE_SUPPORT</span> : list[str]</code></dt>
+<dd>
+<div class="desc"><p>extension of file that are actually supported (images this case), yet, this doesn't means renpy can, check <a href="https://www.renpy.org/doc/html/displaying_images.html">the renpy docs</a></p></div>
+</dd>
+<dt id="importer.DEFAULT_EXTEND_SOUND_NOT_SUPPORT"><code class="name">var <span class="ident">DEFAULT_EXTEND_SOUND_NOT_SUPPORT</span> : list[str]</code></dt>
+<dd>
+<div class="desc"><p>extension of file that are not actually supported (sound this case), yet, this doesn't means renpy can't, check <a href="https://www.renpy.org/doc/html/movie.html">the renpy docs</a></p></div>
+</dd>
+<dt id="importer.DEFAULT_EXTEND_SOUND_SUPPORT"><code class="name">var <span class="ident">DEFAULT_EXTEND_SOUND_SUPPORT</span> : list[str]</code></dt>
+<dd>
+<div class="desc"><p>extension of file that are actually supported (sounds this case), yet, this doesn't means renpy can, check <a href="https://www.renpy.org/doc/html/movie.html">the renpy docs</a></p></div>
+</dd>
+<dt id="importer.DEFAULT_EXTEND_VIDEO_NOT_SUPPORT"><code class="name">var <span class="ident">DEFAULT_EXTEND_VIDEO_NOT_SUPPORT</span> : list[str]</code></dt>
+<dd>
+<div class="desc"><p>extension of file that are not actually supported (videos this case), yet, this doesn't means renpy can't, check <a href="https://www.renpy.org/doc/html/audio.html">the renpy docs</a></p></div>
+</dd>
+<dt id="importer.DEFAULT_EXTEND_VIDEO_SUPPORT"><code class="name">var <span class="ident">DEFAULT_EXTEND_VIDEO_SUPPORT</span> : list[str]</code></dt>
+<dd>
+<div class="desc"><p>extension of file that are actually supported (videos this case), yet, this doesn't means renpy can, check <a href="https://www.renpy.org/doc/html/audio.html">the renpy docs</a></p></div>
+</dd>
+<dt id="importer.DEFAULT_KIND_IMPORT"><code class="name">var <span class="ident">DEFAULT_KIND_IMPORT</span> : Literal['source', 'dev', 'zip']</code></dt>
+<dd>
+<div class="desc"><p>controll the template used</p></div>
+</dd>
+<dt id="importer.DEFAULT_NAME_LIMIT"><code class="name">var <span class="ident">DEFAULT_NAME_LIMIT</span> : int</code></dt>
+<dd>
+<div class="desc"><p>controll the times limit for the tool find the <strong>character.rpy</strong> file to get the alias from some character</p></div>
+</dd>
+<dt id="importer.DEFAULT_PATH_IMAGE"><code class="name">var <span class="ident">DEFAULT_PATH_IMAGE</span> : str</code></dt>
+<dd>
+<div class="desc"><p>default folder to search for images, check <a href="#folder-structure">folder structure</a> for more info</p></div>
+</dd>
+<dt id="importer.DEFAULT_PATH_SIDE"><code class="name">var <span class="ident">DEFAULT_PATH_SIDE</span> : str</code></dt>
+<dd>
+<div class="desc"><p>default folder to add side variants (once created), this will use of <strong><code><a title="importer.DEFAULT_PATH_IMAGE" href="#importer.DEFAULT_PATH_IMAGE">DEFAULT_PATH_IMAGE</a></code>/[etc]/[sprite/character]/<code><a title="importer.DEFAULT_PATH_SIDE" href="#importer.DEFAULT_PATH_SIDE">DEFAULT_PATH_SIDE</a></code></strong></p></div>
+</dd>
+<dt id="importer.DEFAULT_PATH_SOUND"><code class="name">var <span class="ident">DEFAULT_PATH_SOUND</span> : str</code></dt>
+<dd>
+<div class="desc"><p>default folder to search for audio, check <a href="#folder-structure">folder structure</a> for more info</p></div>
+</dd>
+<dt id="importer.DEFAULT_PATH_VIDEO"><code class="name">var <span class="ident">DEFAULT_PATH_VIDEO</span> : str</code></dt>
+<dd>
+<div class="desc"><p>default folder to search for videos, check <a href="#folder-structure">folder structure</a> for more info</p></div>
+</dd>
+<dt id="importer.DEFAULT_RESOURCE_PATH"><code class="name">var <span class="ident">DEFAULT_RESOURCE_PATH</span> : str</code></dt>
+<dd>
+<div class="desc"><p>default folder to search for assets, check <a href="#folder-structure">folder structure</a> for more info</p></div>
+</dd>
+<dt id="importer.DEFAULT_SIZE_CORP_VAR"><code class="name">var <span class="ident">DEFAULT_SIZE_CORP_VAR</span> : tuple[int, int, int, int]</code></dt>
+<dd>
+<div class="desc"><p>default dimensions to cut from an image</p></div>
+</dd>
+<dt id="importer.DEFAULT_SIZE_SCREEN"><code class="name">var <span class="ident">DEFAULT_SIZE_SCREEN</span> : str</code></dt>
+<dd>
+<div class="desc"><p>default target's screen dimension</p></div>
+</dd>
+<dt id="importer.DEFAULT_SIZE_SIDE_VAR"><code class="name">var <span class="ident">DEFAULT_SIZE_SIDE_VAR</span> : str</code></dt>
+<dd>
+<div class="desc"><p>default target's frame used by side variants</p></div>
+</dd>
+<dt id="importer.DEFAULT_TAB"><code class="name">var <span class="ident">DEFAULT_TAB</span> : int</code></dt>
+<dd>
+<div class="desc"><p>controll how the tool detect lines within the renpy files (hope you use tabs.... please&hellip; use TABs)</p></div>
+</dd>
+<dt id="importer.FILE_NAME_REPLACE"><code class="name">var <span class="ident">FILE_NAME_REPLACE</span> : dict[int, str]</code></dt>
+<dd>
+<div class="desc"><p>a list of symbols that we hate and they must be replaced at once!</p></div>
+</dd>
+<dt id="importer.FILE_NAME_REPLACE_LONG"><code class="name">var <span class="ident">FILE_NAME_REPLACE_LONG</span> : dict[str, str]</code></dt>
+<dd>
+<div class="desc"><p>a list of symbols to resume some names (when used) to not match with renpy keyword/reserved words </p>
+<p><a href="https://www.renpy.org/wiki/renpy/spa/doc/reference/El_lenguaje_Ren'Py">this material</a> is old, but it cover the basics of why this variable</p></div>
+</dd>
+<dt id="importer.FORMAT"><code class="name">var <span class="ident">FORMAT</span> : str</code></dt>
+<dd>
+<div class="desc"><p>The format used by the logger <code><a title="importer.logger" href="#importer.logger">logger</a></code></p></div>
+</dd>
+<dt id="importer.FORMATS_IMPORTED"><code class="name">var <span class="ident">FORMATS_IMPORTED</span> : dict[<a title="importer.TemplateKeys" href="#importer.TemplateKeys">TemplateKeys</a> | str, str | list[str]]</code></dt>
+<dd>
+<div class="desc"><p>The actual variable that the tool will make use, not what <code><a title="importer.BUILDIN_TEMPLATES" href="#importer.BUILDIN_TEMPLATES">BUILDIN_TEMPLATES</a></code>, that's just the default
+implementation in case <code><a title="importer.RequiredFiles.TEMPLATES" href="#importer.RequiredFiles.TEMPLATES">RequiredFiles.TEMPLATES</a></code> couldn't be found</p>
+<p>see <code><a title="importer.BUILDIN_TEMPLATES" href="#importer.BUILDIN_TEMPLATES">BUILDIN_TEMPLATES</a></code> for more info, since the structure it's pretty much the same</p></div>
+</dd>
+<dt id="importer.IGNORE_NOT_SUPPORTED"><code class="name">var <span class="ident">IGNORE_NOT_SUPPORTED</span> : bool</code></dt>
+<dd>
+<div class="desc"><p>controll if ignore not supported files (basically supress some warnings)</p></div>
+</dd>
+<dt id="importer.IMAGE_KEYWORDS"><code class="name">var <span class="ident">IMAGE_KEYWORDS</span> : list[str]</code></dt>
+<dd>
+<div class="desc"><p>Basically this is used as reference by <code><a title="importer.scan_lines_chapters" href="#importer.scan_lines_chapters">scan_lines_chapters()</a></code> to differenciate
+certain statements within the renpy language alonside with <code><a title="importer.SOUND_KEYWORDS" href="#importer.SOUND_KEYWORDS">SOUND_KEYWORDS</a></code></p></div>
+</dd>
+<dt id="importer.KEYS_IMPORTED"><code class="name">var <span class="ident">KEYS_IMPORTED</span> : dict[<a title="importer.TemplateKeys" href="#importer.TemplateKeys">TemplateKeys</a>, list[str]]</code></dt>
+<dd>
+<div class="desc"><p>The actual variable that the tool will make use, not what <code><a title="importer.BUILDIN_ANIMATION_KEYS" href="#importer.BUILDIN_ANIMATION_KEYS">BUILDIN_ANIMATION_KEYS</a></code>, that's just the default
+implementation in case <code><a title="importer.RequiredFiles.ANIMATED" href="#importer.RequiredFiles.ANIMATED">RequiredFiles.ANIMATED</a></code> couldn't be found</p>
+<p>see <code><a title="importer.BUILDIN_ANIMATION_KEYS" href="#importer.BUILDIN_ANIMATION_KEYS">BUILDIN_ANIMATION_KEYS</a></code> for more info, since the structure it's pretty much the same</p></div>
+</dd>
+<dt id="importer.RESERVED_GENERIC_CREA_EXTEN"><code class="name">var <span class="ident">RESERVED_GENERIC_CREA_EXTEN</span> : tuple[str]</code></dt>
+<dd>
+<div class="desc"><p>a silly collection of extensions used by the tool</p></div>
+</dd>
+<dt id="importer.RESERVED_GENERIC_CREA_NAMES"><code class="name">var <span class="ident">RESERVED_GENERIC_CREA_NAMES</span> : tuple[str, str, str]</code></dt>
+<dd>
+<div class="desc"><p>a silly collection of file names used by the tool</p></div>
+</dd>
+<dt id="importer.RESERVED_GENERIC_FILE_EXTEN"><code class="name">var <span class="ident">RESERVED_GENERIC_FILE_EXTEN</span> : list[str]</code></dt>
+<dd>
+<div class="desc"><p>a silly collection of reserved extension (mostly by renpy or by the tool)</p></div>
+</dd>
+<dt id="importer.RESERVED_GENERIC_FILE_NAMES"><code class="name">var <span class="ident">RESERVED_GENERIC_FILE_NAMES</span> : tuple[str, str, str, str, str, str]</code></dt>
+<dd>
+<div class="desc"><p>a silly collection of reserved files that the tool will make use of</p></div>
+</dd>
+<dt id="importer.RESERVED_GENERIC_FOLD_NAMES"><code class="name">var <span class="ident">RESERVED_GENERIC_FOLD_NAMES</span> : tuple[str, str, str, str]</code></dt>
+<dd>
+<div class="desc"><p>a silly collection of reserved folder names</p></div>
+</dd>
+<dt id="importer.ROOT_EXE_GAME"><code class="name">var <span class="ident">ROOT_EXE_GAME</span> : pathlib._local.Path</code></dt>
+<dd>
+<div class="desc"><p>the root folder (usually the same as where the tool is)</p></div>
+</dd>
+<dt id="importer.ROOT_RES_SOFT"><code class="name">var <span class="ident">ROOT_RES_SOFT</span> : pathlib._local.Path</code></dt>
+<dd>
+<div class="desc"><p>the data folder (in windows, basically appdata/<code>__product__</code>/<code>__author__</code>)</p></div>
+</dd>
+<dt id="importer.SKIP_EXTENSION"><code class="name">var <span class="ident">SKIP_EXTENSION</span> : list[str]</code></dt>
+<dd>
+<div class="desc"><p>the same as <code><a title="importer.SKIP_GEN_NAMES" href="#importer.SKIP_GEN_NAMES">SKIP_GEN_NAMES</a></code>, but it's limited to extensions names</p></div>
+</dd>
+<dt id="importer.SKIP_FILE_NAME"><code class="name">var <span class="ident">SKIP_FILE_NAME</span> : list[str]</code></dt>
+<dd>
+<div class="desc"><p>the same as <code><a title="importer.SKIP_GEN_NAMES" href="#importer.SKIP_GEN_NAMES">SKIP_GEN_NAMES</a></code>, but it's limited to file names</p></div>
+</dd>
+<dt id="importer.SKIP_FOL_NAMES"><code class="name">var <span class="ident">SKIP_FOL_NAMES</span> : list[str]</code></dt>
+<dd>
+<div class="desc"><p>the same as <code><a title="importer.SKIP_GEN_NAMES" href="#importer.SKIP_GEN_NAMES">SKIP_GEN_NAMES</a></code>, but it's limited to folder names</p></div>
+</dd>
+<dt id="importer.SKIP_GEN_NAMES"><code class="name">var <span class="ident">SKIP_GEN_NAMES</span> : list[str]</code></dt>
+<dd>
+<div class="desc"><p>a collection of names, this is totally independement from its type</p></div>
+</dd>
+<dt id="importer.SKIP_SYMBOLS"><code class="name">var <span class="ident">SKIP_SYMBOLS</span> : list[str]</code></dt>
+<dd>
+<div class="desc"><p>a series of single-characters, mostly used when the name of something start, this will controll if this will be skiped</p></div>
+</dd>
+<dt id="importer.SOUND_KEYWORDS"><code class="name">var <span class="ident">SOUND_KEYWORDS</span> : list[str]</code></dt>
+<dd>
+<div class="desc"><p>Basically this is used as reference by <code><a title="importer.scan_lines_chapters" href="#importer.scan_lines_chapters">scan_lines_chapters()</a></code> to differenciate
+certain statements within the renpy language alonside with <code><a title="importer.IMAGE_KEYWORDS" href="#importer.IMAGE_KEYWORDS">IMAGE_KEYWORDS</a></code></p></div>
+</dd>
+<dt id="importer.features_available"><code class="name">var <span class="ident">features_available</span> : list[str]</code></dt>
+<dd>
+<div class="desc"><p>A silly collection of features that saves all available/ready to add features</p></div>
+</dd>
+<dt id="importer.features_enabled"><code class="name">var <span class="ident">features_enabled</span> : list[str]</code></dt>
+<dd>
+<div class="desc"><p>the same as <code><a title="importer.features_available" href="#importer.features_available">features_available</a></code>, but when enabled</p></div>
+</dd>
+<dt id="importer.language"><code class="name">var <span class="ident">language</span> : str</code></dt>
+<dd>
+<div class="desc"><p>the selected language, by default <code><a title="importer.os_language" href="#importer.os_language">os_language</a></code> is used, otherwise enligsh by default</p></div>
+</dd>
+<dt id="importer.languages"><code class="name">var <span class="ident">languages</span> : dict[str, dict[str, str]]</code></dt>
+<dd>
+<div class="desc"><p>The dictonary used by the language service, and this is a buildin variable that basically saves all of them</p>
+<p>a file could be better, but might limit the tool</p></div>
+</dd>
+<dt id="importer.logger"><code class="name">var <span class="ident">logger</span> : logging.Logger</code></dt>
+<dd>
+<div class="desc"><p>the logger, the files will be saved within the same level as where the tool is, this might be called importer.log</p></div>
+</dd>
+<dt id="importer.os_language"><code class="name">var <span class="ident">os_language</span> : str</code></dt>
+<dd>
+<div class="desc"><p>the detected os language (thanks to <code>getdefaultlocale</code> )</p></div>
+</dd>
+<dt id="importer.parser"><code class="name">var <span class="ident">parser</span> : argparse.ArgumentParser</code></dt>
+<dd>
+<div class="desc"><p>mostly used when the tool is <strong>main</strong></p></div>
+</dd>
+</dl>
+</section>
+<section>
+<h2 class="section-title" id="header-functions">Functions</h2>
+<dl>
+<dt id="importer.add_feature"><code class="name flex">
+<span>def <span class="ident">add_feature</span></span>(<span>what: <a title="importer.FeaturesKeywords" href="#importer.FeaturesKeywords">FeaturesKeywords</a>,<br>is_internal: bool = True) ‑> bool</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Add a feature based on <code><a title="importer.FeaturesKeywords" href="#importer.FeaturesKeywords">FeaturesKeywords</a></code> and return if it was added</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>what</code></strong> :&ensp;<code><a title="importer.FeaturesKeywords" href="#importer.FeaturesKeywords">FeaturesKeywords</a></code></dt>
+<dd>the feature to enable</dd>
+<dt><strong><code>is_internal</code></strong> :&ensp;<code>bool</code>, optional</dt>
+<dd>determine if use <code><a title="importer.features_available" href="#importer.features_available">features_available</a></code> or <code><a title="importer.features_enabled" href="#importer.features_enabled">features_enabled</a></code> to add the feature. Defaults to True.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>bool</code></dt>
+<dd>was it added?</dd>
+</dl></div>
+</dd>
+<dt id="importer.add_jump"><code class="name flex">
+<span>def <span class="ident">add_jump</span></span>(<span>base: list) ‑> list[str]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>this parses <code>base</code> to a <code>list[str]</code> adding <strong>\n</strong> characters</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>base</code></strong> :&ensp;<code>list</code></dt>
+<dd>base</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>list[str]</code></dt>
+<dd>parsed base</dd>
+</dl></div>
+</dd>
+<dt id="importer.del_jump"><code class="name flex">
+<span>def <span class="ident">del_jump</span></span>(<span>base: list[str], allow_blank: bool = False) ‑> None</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Delete <strong>\n</strong> and <strong>\r</strong> spaces and tab if possible</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>base</code></strong> :&ensp;<code>list[str]</code></dt>
+<dd>a list of lines to delete those keysfrom</dd>
+<dt><strong><code>allow_blank</code></strong> :&ensp;<code>bool</code>, optional</dt>
+<dd>allow tabs don't be deleted. Defaults to False.</dd>
+</dl></div>
+</dd>
+<dt id="importer.frame"><code class="name flex">
+<span>def <span class="ident">frame</span></span>(<span>parser: argparse.ArgumentParser)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Basically the entry point to start the tool using the default arguments</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>parser</code></strong> :&ensp;<code>ArgumentParser</code></dt>
+<dd>the parser object (if you have one created)</dd>
+</dl></div>
+</dd>
+<dt id="importer.get_list_file_extended"><code class="name flex">
+<span>def <span class="ident">get_list_file_extended</span></span>(<span>extension: str | list[str],<br>is_normal: bool = True,<br>*,<br>origin: pathlib._local.Path = WindowsPath('.'),<br>local: list[str] = []) ‑> list[str]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>similar to <code><a title="importer.get_list_system_file" href="#importer.get_list_system_file">get_list_system_file()</a></code>, but this should those files that match their extension with what is
+being expected</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>extension</code></strong> :&ensp;<code>str | list[str]</code></dt>
+<dd>collection of extensions</dd>
+<dt><strong><code>is_normal</code></strong> :&ensp;<code>bool</code>, optional</dt>
+<dd>return reserved resources or not, not both. Defaults to True.</dd>
+<dt><strong><code>origin</code></strong> :&ensp;<code>Path</code>, optional</dt>
+<dd>origin path. Defaults to Path(".").</dd>
+<dt><strong><code>local</code></strong> :&ensp;<code>list[str]</code>, optional</dt>
+<dd>collection of names, in case you already have the files. Defaults to [].</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>list[str]</code></dt>
+<dd>those names that matched <code>extension</code> list</dd>
+</dl></div>
+</dd>
+<dt id="importer.get_list_file_named"><code class="name flex">
+<span>def <span class="ident">get_list_file_named</span></span>(<span>names: str | Sequence[str] | dict[str | Sequence[str]],<br>is_normal: bool = True,<br>*,<br>origin: pathlib._local.Path = WindowsPath('.'),<br>local: list[str] = []) ‑> list[str]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Similar to <code><a title="importer.get_list_system_file" href="#importer.get_list_system_file">get_list_system_file()</a></code>, but for names</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>names</code></strong> :&ensp;<code>str | Sequence[str] | dict[str
+|
+Sequence[str]]</code></dt>
+<dd>collection of names</dd>
+<dt><strong><code>is_normal</code></strong> :&ensp;<code>bool</code>, optional</dt>
+<dd>return reserved resources or not, not both. Defaults to True.</dd>
+<dt><strong><code>origin</code></strong> :&ensp;<code>Path</code>, optional</dt>
+<dd>origin path. Defaults to Path(".").</dd>
+<dt><strong><code>local</code></strong> :&ensp;<code>list[str]</code>, optional</dt>
+<dd>collection of names, in case you already have the files. Defaults to [].</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>list[str]</code></dt>
+<dd>those names that matched <code>names</code> collection</dd>
+</dl></div>
+</dd>
+<dt id="importer.get_list_files"><code class="name flex">
+<span>def <span class="ident">get_list_files</span></span>(<span>names: list[str],<br>extesions: list[str],<br>is_normal: bool = True,<br>origin: pathlib._local.Path = WindowsPath('.'),<br>local: list[str] = []) ‑> list[str]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>This is just a shortcut that evaluate names and then extensions for a collection of files</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>names</code></strong> :&ensp;<code>list[str]</code></dt>
+<dd>collection of names</dd>
+<dt><strong><code>extesions</code></strong> :&ensp;<code>list[str]</code></dt>
+<dd>collection of extensions</dd>
+<dt><strong><code>is_normal</code></strong> :&ensp;<code>bool</code>, optional</dt>
+<dd>return reserved resources or not, not both. Defaults to True.</dd>
+<dt><strong><code>origin</code></strong> :&ensp;<code>Path</code>, optional</dt>
+<dd>origin path. Defaults to Path(".").</dd>
+<dt><strong><code>local</code></strong> :&ensp;<code>list[str]</code>, optional</dt>
+<dd>collection of names, in case you already have the files. Defaults to [].</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>list[str]</code></dt>
+<dd>those names that matched the given criteria</dd>
+</dl></div>
+</dd>
+<dt id="importer.get_list_namesimple"><code class="name flex">
+<span>def <span class="ident">get_list_namesimple</span></span>(<span>origin: pathlib._local.Path = WindowsPath('.')) ‑> list[str]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Get the simple part of origin and return it as <code>list[str]</code></p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>origin</code></strong> :&ensp;<code>Path</code>, optional</dt>
+<dd>starter path. Defaults to Path(".").</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>list[str]</code></dt>
+<dd>simple part</dd>
+</dl></div>
+</dd>
+<dt id="importer.get_list_subfolders"><code class="name flex">
+<span>def <span class="ident">get_list_subfolders</span></span>(<span>origin: pathlib._local.Path = WindowsPath('.'), exclude: Sequence[str] = []) ‑> list[str | pathlib._local.Path]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>This will recursible get folders and its subfolders within <code>origin</code> based on <code><a title="importer.get_list_system_file" href="#importer.get_list_system_file">get_list_system_file()</a></code></p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>origin</code></strong> :&ensp;<code>Path</code>, optional</dt>
+<dd>starter path. Defaults to Path(".").</dd>
+<dt><strong><code>exclude</code></strong> :&ensp;<code>Sequence[str]</code>, optional</dt>
+<dd>exclode some name. Defaults to [].</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>list[str | Path]</code></dt>
+<dd>all folders/subfolders within <code>origin</code></dd>
+</dl></div>
+</dd>
+<dt id="importer.get_list_system_dirs"><code class="name flex">
+<span>def <span class="ident">get_list_system_dirs</span></span>(<span>origin: pathlib._local.Path = WindowsPath('.'),<br>kind: Literal['dir', 'file', 'both'] = 'file',<br>**kwargs) ‑> list[str | list[str]]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Based on <code>origin</code>, this will get all files based on <code>kind</code> without any filter, whatever is in <code>origin</code>, this will return</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>origin</code></strong> :&ensp;<code>Path</code>, optional</dt>
+<dd>the origin path. Defaults to Path(".").</dd>
+<dt><strong><code>kind</code></strong> :&ensp;<code>_literal_fields_files</code>, optional</dt>
+<dd>the resource type that will return. Defaults to "file".</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>list[str | list[str]]</code></dt>
+<dd>a list of file/folders or both</dd>
+</dl></div>
+</dd>
+<dt id="importer.get_list_system_file"><code class="name flex">
+<span>def <span class="ident">get_list_system_file</span></span>(<span>kind: Literal['dir', 'file', 'both'],<br>origin: pathlib._local.Path = WindowsPath('.'),<br>is_normal: bool = True) ‑> list[str | list[str]]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>similar to <code><a title="importer.get_list_system_dirs" href="#importer.get_list_system_dirs">get_list_system_dirs()</a></code>, but applying <code><a title="importer.is_reserved" href="#importer.is_reserved">is_reserved()</a></code> function to determine that, you can get if the function
+return reserved stuff or not based on <code>is_normal</code> param, but this shouldn't return both, better use <code><a title="importer.get_list_system_dirs" href="#importer.get_list_system_dirs">get_list_system_dirs()</a></code> to get
+both of them</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>kind</code></strong> :&ensp;<code>_literal_fields_files</code></dt>
+<dd>resource type</dd>
+<dt><strong><code>origin</code></strong> :&ensp;<code>Path</code>, optional</dt>
+<dd>origin path. Defaults to Path(".").</dd>
+<dt><strong><code>is_normal</code></strong> :&ensp;<code>bool</code>, optional</dt>
+<dd>return reserved resources or not, not both. Defaults to True.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>list[str | list[str]]</code></dt>
+<dd>collection of files/folders/both</dd>
+</dl></div>
+</dd>
+<dt id="importer.get_message_translated"><code class="name flex">
+<span>def <span class="ident">get_message_translated</span></span>(<span>name: str, /, **kwargs: dict[str, str]) ‑> str</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Get and return the message using the actual language determined by <code><a title="importer.language" href="#importer.language">language</a></code> and the text corresponds to <code><a title="importer.languages" href="#importer.languages">languages</a></code></p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>name</code></strong> :&ensp;<code>str</code></dt>
+<dd>the key to get from</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>str</code></dt>
+<dd>the text in question</dd>
+</dl></div>
+</dd>
+<dt id="importer.get_name_acron"><code class="name flex">
+<span>def <span class="ident">get_name_acron</span></span>(<span>limit: int = 3, origin: pathlib._local.Path = WindowsPath('.')) ‑> str</span>
+</code></dt>
+<dd>
+<div class="desc"><p>get the short or acronimun name for a character based either in their folder if the character.rpy couldn't be found&hellip; or the
+character.rpy file itself</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>limit</code></strong> :&ensp;<code>int</code>, optional</dt>
+<dd>limit of try to get the name before parse the folder. Defaults to 3.</dd>
+<dt><strong><code>origin</code></strong> :&ensp;<code>Path</code>, optional</dt>
+<dd>starter path. Defaults to Path(".").</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>str</code></dt>
+<dd>the shortest name possible (if declared) or the folder's name</dd>
+</dl></div>
+</dd>
+<dt id="importer.get_name_parsed"><code class="name flex">
+<span>def <span class="ident">get_name_parsed</span></span>(<span>file: str) ‑> str</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Given a <code>file</code>'s name, this will parse it into something pretty simple, replacing and deleting numbers if needed</p>
+<h2 id="examples">Examples</h2>
+<hr>
+<table>
+<thead>
+<tr>
+<th>input</th>
+<th>output</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Xellar normal speak.png</td>
+<td>xellar_normal_speak</td>
+</tr>
+<tr>
+<td>Xellar normal speak 1.png</td>
+<td>xellar_normal_speak_1_base</td>
+</tr>
+<tr>
+<td>Xellar!normal!speak.png</td>
+<td>xellar_normal_speak</td>
+</tr>
+</tbody>
+</table>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>file</code></strong> :&ensp;<code>str</code></dt>
+<dd>file</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>str</code></dt>
+<dd>file parsed</dd>
+</dl></div>
+</dd>
+<dt id="importer.get_name_template"><code class="name flex">
+<span>def <span class="ident">get_name_template</span></span>(<span>file: str,<br>path: str,<br>mode: <a title="importer.ParseKeywords" href="#importer.ParseKeywords">ParseKeywords</a>,<br>limit: int = 3) ‑> tuple[str, str]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Given the file and path, this will parse it base in the selected mode, this has a limit of character that you
+can customize with the <code>limit</code> parameter</p>
+<p>the return mostly depends on <code><a title="importer.BUILDIN_FILE_TEMPLATES" href="#importer.BUILDIN_FILE_TEMPLATES">BUILDIN_FILE_TEMPLATES</a></code> var</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>file</code></strong> :&ensp;<code>str</code></dt>
+<dd>file</dd>
+<dt><strong><code>path</code></strong> :&ensp;<code>str</code></dt>
+<dd>path</dd>
+<dt><strong><code>mode</code></strong> :&ensp;<code><a title="importer.ParseKeywords" href="#importer.ParseKeywords">ParseKeywords</a></code></dt>
+<dd>mode based in <code><a title="importer.ParseKeywords" href="#importer.ParseKeywords">ParseKeywords</a></code>.</dd>
+<dt><strong><code>limit</code></strong> :&ensp;<code>int</code>, optional</dt>
+<dd>limit of characters. Defaults to <code><a title="importer.DEFAULT_NAME_LIMIT" href="#importer.DEFAULT_NAME_LIMIT">DEFAULT_NAME_LIMIT</a></code>.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>tuple[str, str]</code></dt>
+<dd>the file and path parsed by <code><a title="importer.ParseKeywords" href="#importer.ParseKeywords">ParseKeywords</a></code></dd>
+</dl></div>
+</dd>
+<dt id="importer.get_path_parsed"><code class="name flex">
+<span>def <span class="ident">get_path_parsed</span></span>(<span>start: str | list[str], origin: pathlib._local.Path = WindowsPath('.')) ‑> str</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Based on a certain start keywords, this will cut <code>origin</code> and return its path if exits, otherwise, it'll return
+<code>origin</code> as posix</p>
+<h2 id="examples">Examples</h2>
+<hr>
+<p>here start is <code>["assets", "images"]</code> when a good case</p>
+<table>
+<thead>
+<tr>
+<th>input</th>
+<th>output</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>C:/Users/[USER]/Desktop/awesome-game/game/assets/images/Sprites/Xellar</td>
+<td>assets/images/Sprites/Xellar</td>
+</tr>
+</tbody>
+</table>
+<p>here start is <code>["images"]</code> when a good case</p>
+<table>
+<thead>
+<tr>
+<th>input</th>
+<th>output</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>C:/Users/[USER]/Desktop/awesome-game/game/assets/images/Sprites/Xellar</td>
+<td>images/Sprites/Xellar</td>
+</tr>
+</tbody>
+</table>
+<p><br><br></p>
+<p>here start is <code>["assets", "images"]</code> when a bad case</p>
+<ul>
+<li>Example 1</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>input</th>
+<th>output</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>C:/Users/[USER]/Desktop/awesome-game/game/images/Sprites/Xellar</td>
+<td>C:/Users/[USER]/Desktop/awesome-game/game/images/Sprites/Xellar</td>
+</tr>
+</tbody>
+</table>
+<p><br><br></p>
+<ul>
+<li>Example 2</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>input</th>
+<th>output</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>C:/Users/[USER]/Desktop/awesome-game/game/assets/Xellar</td>
+<td>C:/Users/[USER]/Desktop/awesome-game/game/assets/Xellar</td>
+</tr>
+</tbody>
+</table>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>start</code></strong> :&ensp;<code>str | list[str]</code></dt>
+<dd>collection of parts/folders to cut from</dd>
+<dt><strong><code>origin</code></strong> :&ensp;<code>Path</code>, optional</dt>
+<dd>starter path. Defaults to Path(".").</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>str</code></dt>
+<dd>parsed <code>origin</code> <strong>OR</strong> <code>origin</code> as posix</dd>
+</dl></div>
+</dd>
+<dt id="importer.given_path"><code class="name flex">
+<span>def <span class="ident">given_path</span></span>(<span>path: str) ‑> pathlib._local.Path</span>
+</code></dt>
+<dd>
+<div class="desc"><p>just a silly function to check if the given path exits</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>path</code></strong> :&ensp;<code>str</code></dt>
+<dd>a path</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>ValueError</code></dt>
+<dd>raised if the path doesn't exits</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>Path</code></dt>
+<dd>the path as object</dd>
+</dl></div>
+</dd>
+<dt id="importer.handler"><code class="name flex">
+<span>def <span class="ident">handler</span></span>(<span>origin: <a title="importer.ArgumentsGiven" href="#importer.ArgumentsGiven">ArgumentsGiven</a>)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Basically a handler that after <code><a title="importer.frame" href="#importer.frame">frame()</a></code> was used, checks for the origin arguments and perform certain proccess</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>origin</code></strong> :&ensp;<code><a title="importer.ArgumentsGiven" href="#importer.ArgumentsGiven">ArgumentsGiven</a></code></dt>
+<dd>a bunch of arugments</dd>
+</dl></div>
+</dd>
+<dt id="importer.has_feature"><code class="name flex">
+<span>def <span class="ident">has_feature</span></span>(<span>what: <a title="importer.FeaturesKeywords" href="#importer.FeaturesKeywords">FeaturesKeywords</a>,<br>is_internal: bool = True) ‑> bool</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Check if the feature is enabled or can exits</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>what</code></strong> :&ensp;<code><a title="importer.FeaturesKeywords" href="#importer.FeaturesKeywords">FeaturesKeywords</a></code></dt>
+<dd>the feature</dd>
+<dt><strong><code>is_internal</code></strong> :&ensp;<code>bool</code>, optional</dt>
+<dd>determine if use <code><a title="importer.features_available" href="#importer.features_available">features_available</a></code> or <code><a title="importer.features_enabled" href="#importer.features_enabled">features_enabled</a></code>. Defaults to True.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>bool</code></dt>
+<dd>has the feature?</dd>
+</dl></div>
+</dd>
+<dt id="importer.has_required_keys"><code class="name flex">
+<span>def <span class="ident">has_required_keys</span></span>(<span>base: list[str], reference: enum.StrEnum) ‑> bool</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Check if all <code>base</code> keys exits in <code>reference</code>, which is a enum</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>base</code></strong> :&ensp;<code>list[str]</code></dt>
+<dd>base</dd>
+<dt><strong><code>reference</code></strong> :&ensp;<code>StrEnum</code></dt>
+<dd>reference enum</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>bool</code></dt>
+<dd>¿all <code>base</code> exits in <code>reference</code></dd>
+</dl></div>
+</dd>
+<dt id="importer.import_audio"><code class="name flex">
+<span>def <span class="ident">import_audio</span></span>(<span>origin: pathlib._local.Path = WindowsPath('.'), single: bool = False) ‑> None</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Entry point to import stuff from <code><a title="importer.DEFAULT_PATH_SOUND" href="#importer.DEFAULT_PATH_SOUND">DEFAULT_PATH_SOUND</a></code> folder</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>origin</code></strong> :&ensp;<code>Path</code>, optional</dt>
+<dd>patyh starter. Defaults to Path(".").</dd>
+<dt><strong><code>single</code></strong> :&ensp;<code>bool</code>, optional</dt>
+<dd>limit <code><a title="importer.write_common_file" href="#importer.write_common_file">write_common_file()</a></code> to only the origin. Defaults to False.</dd>
+</dl></div>
+</dd>
+<dt id="importer.import_backgrounds"><code class="name flex">
+<span>def <span class="ident">import_backgrounds</span></span>(<span>origin: pathlib._local.Path = WindowsPath('.')) ‑> None</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Entry point to import stuff from <code><a title="importer.DEFAULT_PATH_IMAGE" href="#importer.DEFAULT_PATH_IMAGE">DEFAULT_PATH_IMAGE</a></code> folder, but for background</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>origin</code></strong> :&ensp;<code>Path</code>, optional</dt>
+<dd>patyh starter. Defaults to Path(".").</dd>
+</dl></div>
+</dd>
+<dt id="importer.import_sprites"><code class="name flex">
+<span>def <span class="ident">import_sprites</span></span>(<span>origin: pathlib._local.Path = WindowsPath('.'), single: bool = False)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Entry point to import stuff from <code><a title="importer.DEFAULT_PATH_IMAGE" href="#importer.DEFAULT_PATH_IMAGE">DEFAULT_PATH_IMAGE</a></code> folder, but for sprites</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>origin</code></strong> :&ensp;<code>Path</code>, optional</dt>
+<dd>patyh starter. Defaults to Path(".").</dd>
+<dt><strong><code>single</code></strong> :&ensp;<code>bool</code>, optional</dt>
+<dd>limit <code><a title="importer.write_common_file" href="#importer.write_common_file">write_common_file()</a></code> to only the origin. Defaults to False.</dd>
+</dl></div>
+</dd>
+<dt id="importer.import_video"><code class="name flex">
+<span>def <span class="ident">import_video</span></span>(<span>origin: pathlib._local.Path = WindowsPath('.'), single: bool = False) ‑> None</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Entry point to import stuff from <code><a title="importer.DEFAULT_PATH_VIDEO" href="#importer.DEFAULT_PATH_VIDEO">DEFAULT_PATH_VIDEO</a></code> folder</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>origin</code></strong> :&ensp;<code>Path</code>, optional</dt>
+<dd>patyh starter. Defaults to Path(".").</dd>
+<dt><strong><code>single</code></strong> :&ensp;<code>bool</code>, optional</dt>
+<dd>limit <code><a title="importer.write_common_file" href="#importer.write_common_file">write_common_file()</a></code> to only the origin. Defaults to False.</dd>
+</dl></div>
+</dd>
+<dt id="importer.is_animated_name"><code class="name flex">
+<span>def <span class="ident">is_animated_name</span></span>(<span>name: str) ‑> <a title="importer.TemplateKeys" href="#importer.TemplateKeys">TemplateKeys</a> | None</span>
+</code></dt>
+<dd>
+<div class="desc"><p>checks if the name is animated and return the key that corresponds to <code><a title="importer.TemplateKeys" href="#importer.TemplateKeys">TemplateKeys</a></code>, none if fails</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>name</code></strong> :&ensp;<code>str</code></dt>
+<dd>name to evaluate</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>TemplateKeys | None</code></dt>
+<dd>result</dd>
+</dl></div>
+</dd>
+<dt id="importer.is_reserved"><code class="name flex">
+<span>def <span class="ident">is_reserved</span></span>(<span>name: str, kind: Literal['dir', 'file', 'both'] = 'file') ‑> bool</span>
+</code></dt>
+<dd>
+<div class="desc"><p>check if the given name is reserved by the tool or not, based on <code>kind</code>, will use <code><a title="importer.RESERVED_GENERIC_FOLD_NAMES" href="#importer.RESERVED_GENERIC_FOLD_NAMES">RESERVED_GENERIC_FOLD_NAMES</a></code> or <code><a title="importer.RESERVED_GENERIC_FILE_NAMES" href="#importer.RESERVED_GENERIC_FILE_NAMES">RESERVED_GENERIC_FILE_NAMES</a></code> and its
+skip variables</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>name</code></strong> :&ensp;<code>str</code></dt>
+<dd>to match</dd>
+<dt><strong><code>kind</code></strong> :&ensp;<code>_literal_fields_files</code>, optional</dt>
+<dd>resource type. Defaults to "file".</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>bool</code></dt>
+<dd>is reserved?</dd>
+</dl></div>
+</dd>
+<dt id="importer.mkr_dir"><code class="name flex">
+<span>def <span class="ident">mkr_dir</span></span>(<span>what: str,<br>root: pathlib._local.Path | str = WindowsPath('C:/Users/Z3R0_GT/Desktop/Repos/renpy-auto-importer')) ‑> pathlib._local.Path</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Basicallt this create the given <code>what</code> folder and return the path to it</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>this will <strong>not</strong> evaluate if the given path really exits</p>
+</div>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>what</code></strong> :&ensp;<code>str</code></dt>
+<dd>folder(s) to create</dd>
+<dt><strong><code>root</code></strong> :&ensp;<code>Path | str</code>, optional</dt>
+<dd>actual path. Defaults to <code><a title="importer.ROOT_EXE_GAME" href="#importer.ROOT_EXE_GAME">ROOT_EXE_GAME</a></code>.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>Path</code></dt>
+<dd>root / what with the path already created</dd>
+</dl></div>
+</dd>
+<dt id="importer.mkr_lines_list"><code class="name flex">
+<span>def <span class="ident">mkr_lines_list</span></span>(<span>simple_path: str,<br>abbr: str,<br>files: list[str],<br>modes: list[str],<br>folder: pathlib._local.Path = WindowsPath('.')) ‑> list[str]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>This function works better when <code><a title="importer.write_common_file" href="#importer.write_common_file">write_common_file()</a></code> call it, yet, you can still used, this requires the simple path
+from <code>origin</code> (which you can get using <code><a title="importer.get_path_parsed" href="#importer.get_path_parsed">get_path_parsed()</a></code>), the abbreviation (using <code><a title="importer.get_name_acron" href="#importer.get_name_acron">get_name_acron()</a></code>) and the list of files within the simple
+path, this must be name only the file's name, or folder(s) + file relative to <code>origin</code> (or the same, simple_path)</p>
+<p>for more info about modes, check <code><a title="importer.write_common_file" href="#importer.write_common_file">write_common_file()</a></code> where it's better explained</p>
+<p>and folder which is used to validate simple_path</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>simple_path</code></strong> :&ensp;<code>str</code></dt>
+<dd>the simpliest representation of a path, being (for example) assets/image/Xellar</dd>
+<dt><strong><code>abbr</code></strong> :&ensp;<code>str</code></dt>
+<dd>abbreviation of the folder</dd>
+<dt><strong><code>files</code></strong> :&ensp;<code>list[str]</code></dt>
+<dd>a collection of files</dd>
+<dt><strong><code>modes</code></strong> :&ensp;<code>list[str]</code></dt>
+<dd>modes to work with (based in different enums)</dd>
+<dt><strong><code>folder</code></strong> :&ensp;<code>Path</code>, optional</dt>
+<dd>the actual folder. Defaults to Path(".").</dd>
+</dl>
+<h2 id="raises">Raises</h2>
+<dl>
+<dt><code>TypeError</code></dt>
+<dd>raised if some template within <code><a title="importer.FORMATS_IMPORTED" href="#importer.FORMATS_IMPORTED">FORMATS_IMPORTED</a></code> is incorrect formatted or is an unsupported object type</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>list[str]</code></dt>
+<dd>a collection of lines that represent the declaration of a common.rpy file</dd>
+</dl></div>
+</dd>
+<dt id="importer.mkr_str"><code class="name flex">
+<span>def <span class="ident">mkr_str</span></span>(<span>base: list, sep: str = '') ‑> str</span>
+</code></dt>
+<dd>
+<div class="desc"><p>this parses a <code>base</code> to a simple <code>str</code> using the <code>sep</code></p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>base</code></strong> :&ensp;<code>list</code></dt>
+<dd>base</dd>
+<dt><strong><code>sep</code></strong> :&ensp;<code>str</code>, optional</dt>
+<dd>separator. Defaults to "".</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>str</code></dt>
+<dd>parsed base</dd>
+</dl></div>
+</dd>
+<dt id="importer.rm_defaults"><code class="name flex">
+<span>def <span class="ident">rm_defaults</span></span>(<span>origin: pathlib._local.Path = WindowsPath('.')) ‑> None</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Remove those files reserved by the tool (to avoid overwriting the same data or duplicates)</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>origin</code></strong> :&ensp;<code>Path</code>, optional</dt>
+<dd>starter path. Defaults to Path(".").</dd>
+</dl></div>
+</dd>
+<dt id="importer.scan_file_compressed"><code class="name flex">
+<span>def <span class="ident">scan_file_compressed</span></span>(<span>kind: Literal['image', 'sound', 'video'] = 'image',<br>origin: pathlib._local.Path = WindowsPath('.')) ‑> bool</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Scan the actual <code>origin</code> and report those files that needs compression</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>kind</code></strong> :&ensp;<code>_literal_fields_exten</code>, optional</dt>
+<dd>resource type. Defaults to "image".</dd>
+<dt><strong><code>origin</code></strong> :&ensp;<code>Path</code>, optional</dt>
+<dd>starter path. Defaults to Path(".").</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>bool</code></dt>
+<dd>does <code>origin</code> have some file that needs compression?</dd>
+</dl></div>
+</dd>
+<dt id="importer.scan_folder_for"><code class="name flex">
+<span>def <span class="ident">scan_folder_for</span></span>(<span>folder: str,<br>origin: pathlib._local.Path = WindowsPath('.'),<br>is_normal: bool = True) ‑> bool</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Scan for a certain folder starting from <code>origin</code>, use <code>is_normal</code> to indicate if it's
+reserved</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>folder</code></strong> :&ensp;<code>str</code></dt>
+<dd>target folder</dd>
+<dt><strong><code>origin</code></strong> :&ensp;<code>Path</code>, optional</dt>
+<dd>starter path. Defaults to Path(".").</dd>
+<dt><strong><code>is_normal</code></strong> :&ensp;<code>bool</code>, optional</dt>
+<dd>return reserved resources or not, not both. Defaults to True.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>bool</code></dt>
+<dd>was founded?</dd>
+</dl></div>
+</dd>
+<dt id="importer.scan_lines_chapters"><code class="name flex">
+<span>def <span class="ident">scan_lines_chapters</span></span>(<span>aliases: list[str], origin: pathlib._local.Path = WindowsPath('.')) ‑> dict[str, dict[str, dict[str, list[int]]]]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>This basically takes those chapter files and look for certain statements that used resources (like images, sound, video, etc&hellip;) and
+register their locations for later use, the origin should be data folder (or basically ./game) folder</p>
+<p>the structure is basically</p>
+<pre><code class="language-python">{
+    &quot;file&quot;: {
+        &quot;resource type&quot;: {
+            &quot;statement&quot;: [0, 2, 3]
+        }
+    }#where each number is where the statement is being used
+}
+</code></pre>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>aliases</code></strong> :&ensp;<code>list[str]</code></dt>
+<dd>mostly belongs to character</dd>
+<dt><strong><code>origin</code></strong> :&ensp;<code>Path</code>, optional</dt>
+<dd>path starter. Defaults to Path(".").</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>dict[str, dict[str, dict[str, list[int]]]]</code></dt>
+<dd>the representation of info</dd>
+</dl></div>
+</dd>
+<dt id="importer.scan_lines_common"><code class="name flex">
+<span>def <span class="ident">scan_lines_common</span></span>(<span>origin: pathlib._local.Path = WindowsPath('.')) ‑> dict[pathlib._local.Path, list[str]]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Basically this will search trought the whole <code><a title="importer.DEFAULT_RESOURCE_PATH" href="#importer.DEFAULT_RESOURCE_PATH">DEFAULT_RESOURCE_PATH</a></code> folder to look for commmon files,
+get their content and then save their definitions <strong>individually</strong> in the form of</p>
+<pre><code class="language-python">{
+    &quot;path/to/common/file&quot;: [
+        &quot;define xellar = ....&quot;,
+        &quot;define xellar_happy = ....&quot;
+    ] # and so for each thing
+}
+</code></pre>
+<p>this for later use</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>origin</code></strong> :&ensp;<code>Path</code>, optional</dt>
+<dd>path starter. Defaults to Path(".").</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>dict[Path, list[str]]</code></dt>
+<dd>all files with their contents</dd>
+</dl></div>
+</dd>
+<dt id="importer.scan_subfolder_do"><code class="name flex">
+<span>def <span class="ident">scan_subfolder_do</span></span>(<span>what: Callable[[pathlib._local.Path], list[T]],<br>*args,<br>exclude: Sequence[str] = [],<br>origin: pathlib._local.Path = WindowsPath('.'),<br>**kwargs) ‑> list[T]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Scan between folders and do something while that, this will also send args and kwargs to the <code>what</code> function each time</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>what</code></strong> :&ensp;<code>Callable[[Path], list[T]]</code></dt>
+<dd>function that will be called per folder, the first argument will always be the actual folder</dd>
+<dt><strong><code>exclude</code></strong> :&ensp;<code>Sequence[str]</code>, optional</dt>
+<dd>names to be excluded. Defaults to [].</dd>
+<dt><strong><code>origin</code></strong> :&ensp;<code>Path</code>, optional</dt>
+<dd>starter path. Defaults to Path(".").</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>list[T]</code></dt>
+<dd>depends on what returns, this will also apply it</dd>
+</dl></div>
+</dd>
+<dt id="importer.write_chipher_images"><code class="name flex">
+<span>def <span class="ident">write_chipher_images</span></span>(<span>origin: pathlib._local.Path = WindowsPath('.'))</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Soon</p>
+<div class="admonition todo">
+<p class="admonition-title">TODO</p>
+<p>this function doesn't exits.... based in 1.0.5.0 version</p>
+</div>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>origin</code></strong> :&ensp;<code>Path</code>, optional</dt>
+<dd>starter path. Defaults to Path(".").</dd>
+</dl></div>
+</dd>
+<dt id="importer.write_common_file"><code class="name flex">
+<span>def <span class="ident">write_common_file</span></span>(<span>modes: list[str],<br>info: configparser.ConfigParser,<br>origin: pathlib._local.Path = WindowsPath('.'),<br>folders: list[str | pathlib._local.Path] = ['']) ‑> None</span>
+</code></dt>
+<dd>
+<div class="desc"><p>this is one of the core functions of this tool, it basically takes a series of modes (mostly based from <code><a title="importer.TemplatePath" href="#importer.TemplatePath">TemplatePath</a></code>, <code><a title="importer.ImportKeywords" href="#importer.ImportKeywords">ImportKeywords</a></code>,
+<code><a title="importer.ParseKeywords" href="#importer.ParseKeywords">ParseKeywords</a></code>, <code><a title="importer.ProccesKeywords" href="#importer.ProccesKeywords">ProccesKeywords</a></code> and so on) based on their <code>origin</code>, this will apply differents procces for each individual case, but always running as a single function</p>
+<p>this function does actually write a common.rpy file, but it doesn't scan and evaluate files, that's <code><a title="importer.mkr_lines_list" href="#importer.mkr_lines_list">mkr_lines_list()</a></code>'s job</p>
+<h2 id="how-it-works">How It Works</h2>
+<p>first of all, we need the modes, for example</p>
+<pre><code class="language-python">[
+    ParseKeywords.FILE,
+
+    TemplateKeys.NORMAL,
+
+    ImportKeywords.IMAGES,
+]
+</code></pre>
+<p>with these mode, we are telling the function to write in a <strong>file format</strong> (<code><a title="importer.ParseKeywords.FILE" href="#importer.ParseKeywords.FILE">ParseKeywords.FILE</a></code>), enabling it
+to use a <strong>normal template</strong> (<code><a title="importer.TemplateKeys.NORMAL" href="#importer.TemplateKeys.NORMAL">TemplateKeys.NORMAL</a></code>), and the resources are <strong>images</strong> (<code><a title="importer.ImportKeywords.IMAGES" href="#importer.ImportKeywords.IMAGES">ImportKeywords.IMAGES</a></code>)</p>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>alway remember to check what each one of these modes/keywords means, since
+in most cases what it says, it's what it does, except if it's explained the otherwise</p>
+</div>
+<p>then we have the <code>info</code>, which is basically a config windows-like file, this makes use of <code><a title="importer.ImageConfigHead" href="#importer.ImageConfigHead">ImageConfigHead</a></code> and hereby
+<code><a title="importer.ImageConfigValue" href="#importer.ImageConfigValue">ImageConfigValue</a></code> as well</p>
+<p><code>origin</code> it's the same as <code>folders</code>, but <code>origin</code> is the starter path, then <code>folders</code> are some folders where you want to repliacte the same procces
+using <code>modes</code>, these ones could be relative to <code>origin</code> or absolute, in whichever case, it's already considered both cases as individuals</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>a side note, <code>modes</code> basically controlls how the function and <code><a title="importer.mkr_lines_list" href="#importer.mkr_lines_list">mkr_lines_list()</a></code> (also the other functions that relies on <code>modes</code> and their enums)
+behave, within <code>origin</code> and others, there are some mechanism to assume information, such as determine the file of <code>origin</code> in case <code><a title="importer.ImportKeywords" href="#importer.ImportKeywords">ImportKeywords</a></code> wasn't provided</p>
+<p>an so other part, but esscencialy, you must indicate one <code><a title="importer.ParseKeywords" href="#importer.ParseKeywords">ParseKeywords</a></code> and <code><a title="importer.TemplateKeys" href="#importer.TemplateKeys">TemplateKeys</a></code> at least to make this function do something</p>
+</div>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>modes</code></strong> :&ensp;<code>list[str]</code></dt>
+<dd>modes to work with (based in different enums)</dd>
+<dt><strong><code>info</code></strong> :&ensp;<code>ConfigParser</code></dt>
+<dd>config window-like file</dd>
+<dt><strong><code>origin</code></strong> :&ensp;<code>Path</code>, optional</dt>
+<dd>starter path. Defaults to Path(".").</dd>
+<dt><strong><code>folders</code></strong> :&ensp;<code>list[str
+|
+Path]</code>, optional</dt>
+<dd>folders to replicate <code>modes</code> behavior. Defaults to [""].</dd>
+</dl></div>
+</dd>
+<dt id="importer.write_names"><code class="name flex">
+<span>def <span class="ident">write_names</span></span>(<span>sprites: pathlib._local.Path = WindowsPath('.'),<br>game_data: pathlib._local.Path = WindowsPath('.')) ‑> tuple[<a title="importer.SearchEngine" href="#importer.SearchEngine">SearchEngine</a>, dict[str, tuple[str, str, str, int]], dict[str, dict[str, dict[str, list[int]]]]]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>this function basically gets all declarations used within the chapters files, basically its a helper to rename
+all declarations used for a certain file</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>sprites</code></strong> :&ensp;<code>Path</code>, optional</dt>
+<dd>sprite folder. Defaults to Path(".").</dd>
+<dt><strong><code>game_data</code></strong> :&ensp;<code>Path</code>, optional</dt>
+<dd>game data folder. Defaults to Path(".").</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>tuple[<a title="importer.SearchEngine" href="#importer.SearchEngine">SearchEngine</a>, _to_change_statements, _statements_used]</code></dt>
+<dd>information (maybe not the best return lol)</dd>
+</dl></div>
+</dd>
+<dt id="importer.write_side_image"><code class="name flex">
+<span>def <span class="ident">write_side_image</span></span>(<span>size: tuple[int, int, int, int],<br>load: dict[<a title="importer.TemplatePathKeys" href="#importer.TemplatePathKeys">TemplatePathKeys</a>, str | list[str]],<br>file_generation_limit: int = 99) ‑> bool</span>
+</code></dt>
+<dd>
+<div class="desc"><p>This will create a side folder based from <code><a title="importer.TemplatePathKeys.BASE" href="#importer.TemplatePathKeys.BASE">TemplatePathKeys.BASE</a></code> in <code>load</code> and skip if the name contains
+certain parts in <code><a title="importer.TemplatePathKeys.NAME" href="#importer.TemplatePathKeys.NAME">TemplatePathKeys.NAME</a></code></p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>size</code></strong> :&ensp;<code>tuple[int, int, int, int]</code></dt>
+<dd>dimension in LX, LY, RX, RY</dd>
+<dt><strong><code>load</code></strong> :&ensp;<code>dict[TemplatePathKeys, str
+|
+list[str]]</code></dt>
+<dd>basically someone didn't want to use arguments as a normal person, so <code><a title="importer.TemplatePathKeys" href="#importer.TemplatePathKeys">TemplatePathKeys</a></code> exits</dd>
+<dt><strong><code>file_generation_limit</code></strong> :&ensp;<code>int</code>, optional</dt>
+<dd>limit for files. Defaults to 99.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<dl>
+<dt><code>bool</code></dt>
+<dd>did it worked?</dd>
+</dl></div>
+</dd>
+</dl>
+</section>
+<section>
+<h2 class="section-title" id="header-classes">Classes</h2>
+<dl>
+<dt id="importer.ArgumentsGiven"><code class="flex name class">
+<span>class <span class="ident">ArgumentsGiven</span></span>
+<span>(</span><span>game,<br>audio,<br>video,<br>sprite,<br>background,<br>can_generate_side,<br>can_generate_common,<br>use_renamer,<br>use_cipher_zone,<br>can_generate_zip)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>A namedtuple that is used only when the tool is being used as <code>__main__</code>, which basically represents certain options, in what paths
+we refer, such as <code><a title="importer.ArgumentsGiven.game" href="#importer.ArgumentsGiven.game">ArgumentsGiven.game</a></code>, <code><a title="importer.ArgumentsGiven.audio" href="#importer.ArgumentsGiven.audio">ArgumentsGiven.audio</a></code>, <code><a title="importer.ArgumentsGiven.video" href="#importer.ArgumentsGiven.video">ArgumentsGiven.video</a></code>, <code><a title="importer.ArgumentsGiven.sprite" href="#importer.ArgumentsGiven.sprite">ArgumentsGiven.sprite</a></code>, <code><a title="importer.ArgumentsGiven.background" href="#importer.ArgumentsGiven.background">ArgumentsGiven.background</a></code> refers,</p>
+<p>we recomend your proyect be structurered just like <a href="#folder-structure">folder structure</a> suggest, otherwise, you might ended up using some <a href="#commands">commands</a> or all the commands,
+but you can customize their behavior changing manually <code><a title="importer.DEFAULT_RESOURCE_PATH" href="#importer.DEFAULT_RESOURCE_PATH">DEFAULT_RESOURCE_PATH</a></code> (which comes after [proyect]/game) and their respective field (<code><a title="importer.DEFAULT_PATH_VIDEO" href="#importer.DEFAULT_PATH_VIDEO">DEFAULT_PATH_VIDEO</a></code>, <code><a title="importer.DEFAULT_PATH_SOUND" href="#importer.DEFAULT_PATH_SOUND">DEFAULT_PATH_SOUND</a></code>, <code><a title="importer.DEFAULT_PATH_IMAGE" href="#importer.DEFAULT_PATH_IMAGE">DEFAULT_PATH_IMAGE</a></code>)</p>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>an example of how the object is builded can be found in <a href="#commands">commands</a> section, yet, it's important to check <a href="#folder-structure">folder structure</a> for more info
+about why this feature and how critical this one could be</p>
+</div></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>builtins.tuple</li>
+</ul>
+<h3>Instance variables</h3>
+<dl>
+<dt id="importer.ArgumentsGiven.audio"><code class="name">var <span class="ident">audio</span></code></dt>
+<dd>
+<div class="desc"><p>The audio folder (mostly where <strong>[project]/game/audio</strong> in your renpy folder), this must be a valid folder/path to be used!</p></div>
+</dd>
+<dt id="importer.ArgumentsGiven.background"><code class="name">var <span class="ident">background</span></code></dt>
+<dd>
+<div class="desc"><p>Just like <code><a title="importer.ArgumentsGiven.game" href="#importer.ArgumentsGiven.game">ArgumentsGiven.game</a></code>, but for backgrounds' sprites, in most renpy proyects this is more custom that you might expect, check <a href="#folder-structure">folder structure</a> section for suggestions</p></div>
+</dd>
+<dt id="importer.ArgumentsGiven.can_generate_common"><code class="name">var <span class="ident">can_generate_common</span></code></dt>
+<dd>
+<div class="desc"><p>Indicate if common files can be generated</p></div>
+</dd>
+<dt id="importer.ArgumentsGiven.can_generate_side"><code class="name">var <span class="ident">can_generate_side</span></code></dt>
+<dd>
+<div class="desc"><p>Indicate if side images can be generated</p></div>
+</dd>
+<dt id="importer.ArgumentsGiven.can_generate_zip"><code class="name">var <span class="ident">can_generate_zip</span></code></dt>
+<dd>
+<div class="desc"><p>Indicate if zip/compression files can be generated</p></div>
+</dd>
+<dt id="importer.ArgumentsGiven.game"><code class="name">var <span class="ident">game</span></code></dt>
+<dd>
+<div class="desc"><p>The data folder (mostly where <strong>[project]/game</strong> in your renpy folder), this must be a valid folder/path to be used!</p></div>
+</dd>
+<dt id="importer.ArgumentsGiven.sprite"><code class="name">var <span class="ident">sprite</span></code></dt>
+<dd>
+<div class="desc"><p>Just like <code><a title="importer.ArgumentsGiven.game" href="#importer.ArgumentsGiven.game">ArgumentsGiven.game</a></code>, but for characters' sprites, in most renpy proyects this is more custom that you might expect, check <a href="#folder-structure">folder structure</a> section for suggestions</p></div>
+</dd>
+<dt id="importer.ArgumentsGiven.use_cipher_zone"><code class="name">var <span class="ident">use_cipher_zone</span></code></dt>
+<dd>
+<div class="desc"><p>Indicate if cipher system will be used, mostly this requires a custom SDK be made adn this will literally broke all your files if used</p></div>
+</dd>
+<dt id="importer.ArgumentsGiven.use_renamer"><code class="name">var <span class="ident">use_renamer</span></code></dt>
+<dd>
+<div class="desc"><p>Indicate if the renamer process can/will be used</p></div>
+</dd>
+<dt id="importer.ArgumentsGiven.video"><code class="name">var <span class="ident">video</span></code></dt>
+<dd>
+<div class="desc"><p>The video folder (this is depends if your game supports video or not, this might be in <strong>[proyect]/game/video</strong>, otherwise, always check <a href="#folder-structure">folder structure</a> section for more info), this must be a valid folder/path to be used!</p></div>
+</dd>
+</dl>
+</dd>
+<dt id="importer.ColorPerLevel"><code class="flex name class">
+<span>class <span class="ident">ColorPerLevel</span></span>
+<span>(</span><span>*args, **kwds)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>A silly enum that saves certain colors for different porpuses</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>enum.StrEnum</li>
+<li>builtins.str</li>
+<li>enum.ReprEnum</li>
+<li>enum.Enum</li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="importer.ColorPerLevel.CRITIC"><code class="name">var <span class="ident">CRITIC</span></code></dt>
+<dd>
+<div class="desc"><p>Critical color, mostly related to delete files or certain process</p></div>
+</dd>
+<dt id="importer.ColorPerLevel.GENERIC"><code class="name">var <span class="ident">GENERIC</span></code></dt>
+<dd>
+<div class="desc"><p>Generic color</p></div>
+</dd>
+<dt id="importer.ColorPerLevel.INTERNAL"><code class="name">var <span class="ident">INTERNAL</span></code></dt>
+<dd>
+<div class="desc"><p>like <code><a title="importer.ColorPerLevel.GENERIC" href="#importer.ColorPerLevel.GENERIC">ColorPerLevel.GENERIC</a></code>, but for internal porpuses</p></div>
+</dd>
+</dl>
+</dd>
+<dt id="importer.FeaturesKeywords"><code class="flex name class">
+<span>class <span class="ident">FeaturesKeywords</span></span>
+<span>(</span><span>*args, **kwds)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>A silly enum that saves the feature that this tool have (mostly depends if ya have some of all dependencies)</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>enum.StrEnum</li>
+<li>builtins.str</li>
+<li>enum.ReprEnum</li>
+<li>enum.Enum</li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="importer.FeaturesKeywords.IMAGE_CREATION"><code class="name">var <span class="ident">IMAGE_CREATION</span></code></dt>
+<dd>
+<div class="desc"><p>Only exits if ya have <a href="https://pypi.org/project/pillow/">PIL/Pillow</a> installed</p></div>
+</dd>
+<dt id="importer.FeaturesKeywords.PRETTY_CONSOLE"><code class="name">var <span class="ident">PRETTY_CONSOLE</span></code></dt>
+<dd>
+<div class="desc"><p>Only exits if ya have <a href="https://pypi.org/project/tqdm/">tqdm</a> installed</p></div>
+</dd>
+<dt id="importer.FeaturesKeywords.RENAMING_PROCESS"><code class="name">var <span class="ident">RENAMING_PROCESS</span></code></dt>
+<dd>
+<div class="desc"><p>This feature might be easy to make as a buildin, but due how difficult it is, for it's left only if ya have <a href="https://pypi.org/project/Whoosh/">whoosh</a> installed</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>this is temporary 'till we make the actual implementation, for now, it's limited just like <code><a title="importer.FeaturesKeywords.IMAGE_CREATION" href="#importer.FeaturesKeywords.IMAGE_CREATION">FeaturesKeywords.IMAGE_CREATION</a></code> or <code><a title="importer.FeaturesKeywords.ZIP_COMPRESSION" href="#importer.FeaturesKeywords.ZIP_COMPRESSION">FeaturesKeywords.ZIP_COMPRESSION</a></code></p>
+</div></div>
+</dd>
+<dt id="importer.FeaturesKeywords.SIDE_GENERATION"><code class="name">var <span class="ident">SIDE_GENERATION</span></code></dt>
+<dd>
+<div class="desc"><p>This feature is mostly limited if <code><a title="importer.FeaturesKeywords.IMAGE_CREATION" href="#importer.FeaturesKeywords.IMAGE_CREATION">FeaturesKeywords.IMAGE_CREATION</a></code> was enabled and <code><a title="importer.ArgumentsGiven.can_generate_side" href="#importer.ArgumentsGiven.can_generate_side">ArgumentsGiven.can_generate_side</a></code> was used, see <a href="#commands">commands</a> for more info</p></div>
+</dd>
+<dt id="importer.FeaturesKeywords.ZIP_COMPRESSION"><code class="name">var <span class="ident">ZIP_COMPRESSION</span></code></dt>
+<dd>
+<div class="desc"><p>Only exits if ya have <a href="https://pypi.org/project/pyminizip/">pyminizip</a> installed </p></div>
+</dd>
+</dl>
+</dd>
+<dt id="importer.ImageConfigHead"><code class="flex name class">
+<span>class <span class="ident">ImageConfigHead</span></span>
+<span>(</span><span>*args, **kwds)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>A silly enum that configure how the file <code><a title="importer.RequiredFiles.INFO" href="#importer.RequiredFiles.INFO">RequiredFiles.INFO</a></code> behave and their headers</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>enum.StrEnum</li>
+<li>builtins.str</li>
+<li>enum.ReprEnum</li>
+<li>enum.Enum</li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="importer.ImageConfigHead.SCALE"><code class="name">var <span class="ident">SCALE</span></code></dt>
+<dd>
+<div class="desc"><p>header for scale configurations</p></div>
+</dd>
+<dt id="importer.ImageConfigHead.SIDE"><code class="name">var <span class="ident">SIDE</span></code></dt>
+<dd>
+<div class="desc"><p>header for side configurations</p></div>
+</dd>
+</dl>
+</dd>
+<dt id="importer.ImageConfigValue"><code class="flex name class">
+<span>class <span class="ident">ImageConfigValue</span></span>
+<span>(</span><span>*args, **kwds)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>A silly enum that configure the name for each field within <code><a title="importer.ImageConfigHead" href="#importer.ImageConfigHead">ImageConfigHead</a></code> and <code><a title="importer.RequiredFiles.INFO" href="#importer.RequiredFiles.INFO">RequiredFiles.INFO</a></code> file</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>enum.StrEnum</li>
+<li>builtins.str</li>
+<li>enum.ReprEnum</li>
+<li>enum.Enum</li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="importer.ImageConfigValue.DIMENSION"><code class="name">var <span class="ident">DIMENSION</span></code></dt>
+<dd>
+<div class="desc"><p>mostly, this configure the target-screen dimension (1920x1080), this is moslty used by scale functions</p></div>
+</dd>
+<dt id="importer.ImageConfigValue.KEYS"><code class="name">var <span class="ident">KEYS</span></code></dt>
+<dd>
+<div class="desc"><p>configure animation keys when scanning for files</p></div>
+</dd>
+<dt id="importer.ImageConfigValue.REPEAT"><code class="name">var <span class="ident">REPEAT</span></code></dt>
+<dd>
+<div class="desc"><p>configure if something must be repeated (this mostly is used by a different procces, like template)</p></div>
+</dd>
+<dt id="importer.ImageConfigValue.SIZE"><code class="name">var <span class="ident">SIZE</span></code></dt>
+<dd>
+<div class="desc"><p>configure the size</p></div>
+</dd>
+<dt id="importer.ImageConfigValue.SQUARE"><code class="name">var <span class="ident">SQUARE</span></code></dt>
+<dd>
+<div class="desc"><p>configure the square/frame for side images (when created)</p></div>
+</dd>
+</dl>
+</dd>
+<dt id="importer.ImportKeywords"><code class="flex name class">
+<span>class <span class="ident">ImportKeywords</span></span>
+<span>(</span><span>*args, **kwds)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>A silly collection of file types that are supported to import by the tool, they are mostly used to no evaluate twice the file type</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>enum.StrEnum</li>
+<li>builtins.str</li>
+<li>enum.ReprEnum</li>
+<li>enum.Enum</li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="importer.ImportKeywords.IMAGES"><code class="name">var <span class="ident">IMAGES</span></code></dt>
+<dd>
+<div class="desc"><p>indicate to use image not/support extensions</p></div>
+</dd>
+<dt id="importer.ImportKeywords.SOUNDS"><code class="name">var <span class="ident">SOUNDS</span></code></dt>
+<dd>
+<div class="desc"><p>indicate to use sound not/support extensions</p></div>
+</dd>
+<dt id="importer.ImportKeywords.VIDEOS"><code class="name">var <span class="ident">VIDEOS</span></code></dt>
+<dd>
+<div class="desc"><p>indicate to use video not/support extensions</p></div>
+</dd>
+</dl>
+</dd>
+<dt id="importer.MessagesError"><code class="flex name class">
+<span>class <span class="ident">MessagesError</span></span>
+<span>(</span><span>*args, **kwds)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>A silly collection of error messages, mostly used by the language service</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>enum.StrEnum</li>
+<li>builtins.str</li>
+<li>enum.ReprEnum</li>
+<li>enum.Enum</li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="importer.MessagesError.ARGUMENT_NOT_FOUND"><code class="name">var <span class="ident">ARGUMENT_NOT_FOUND</span></code></dt>
+<dd>
+<div class="desc"><p>The type of the None singleton.</p></div>
+</dd>
+<dt id="importer.MessagesError.EXTENSION_ERROR"><code class="name">var <span class="ident">EXTENSION_ERROR</span></code></dt>
+<dd>
+<div class="desc"><p>The type of the None singleton.</p></div>
+</dd>
+<dt id="importer.MessagesError.FEATURE_NOT_SUPPORTED"><code class="name">var <span class="ident">FEATURE_NOT_SUPPORTED</span></code></dt>
+<dd>
+<div class="desc"><p>The type of the None singleton.</p></div>
+</dd>
+<dt id="importer.MessagesError.FEAUTRE_NOT_FOUND"><code class="name">var <span class="ident">FEAUTRE_NOT_FOUND</span></code></dt>
+<dd>
+<div class="desc"><p>The type of the None singleton.</p></div>
+</dd>
+<dt id="importer.MessagesError.FILE_NOT_FOUND"><code class="name">var <span class="ident">FILE_NOT_FOUND</span></code></dt>
+<dd>
+<div class="desc"><p>The type of the None singleton.</p></div>
+</dd>
+<dt id="importer.MessagesError.INCORRECT_ARGUMENTS"><code class="name">var <span class="ident">INCORRECT_ARGUMENTS</span></code></dt>
+<dd>
+<div class="desc"><p>The type of the None singleton.</p></div>
+</dd>
+<dt id="importer.MessagesError.MODULE_NOT_FOUND"><code class="name">var <span class="ident">MODULE_NOT_FOUND</span></code></dt>
+<dd>
+<div class="desc"><p>The type of the None singleton.</p></div>
+</dd>
+<dt id="importer.MessagesError.MODULE_NOT_FOUND_USING_DEFAULT"><code class="name">var <span class="ident">MODULE_NOT_FOUND_USING_DEFAULT</span></code></dt>
+<dd>
+<div class="desc"><p>The type of the None singleton.</p></div>
+</dd>
+<dt id="importer.MessagesError.PATH_NOT_FOUND"><code class="name">var <span class="ident">PATH_NOT_FOUND</span></code></dt>
+<dd>
+<div class="desc"><p>The type of the None singleton.</p></div>
+</dd>
+<dt id="importer.MessagesError.USING_BUILT_IN"><code class="name">var <span class="ident">USING_BUILT_IN</span></code></dt>
+<dd>
+<div class="desc"><p>The type of the None singleton.</p></div>
+</dd>
+</dl>
+</dd>
+<dt id="importer.MessagesMeta"><code class="flex name class">
+<span>class <span class="ident">MessagesMeta</span></span>
+<span>(</span><span>*args, **kwds)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>A silly collection of meta arguments, mostly used by the language service</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>enum.StrEnum</li>
+<li>builtins.str</li>
+<li>enum.ReprEnum</li>
+<li>enum.Enum</li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="importer.MessagesMeta.DESCRIPTION"><code class="name">var <span class="ident">DESCRIPTION</span></code></dt>
+<dd>
+<div class="desc"><p>The type of the None singleton.</p></div>
+</dd>
+<dt id="importer.MessagesMeta.MESSAGE_FUNCTION_ENDED"><code class="name">var <span class="ident">MESSAGE_FUNCTION_ENDED</span></code></dt>
+<dd>
+<div class="desc"><p>The type of the None singleton.</p></div>
+</dd>
+<dt id="importer.MessagesMeta.MESSAGE_FUNCTION_INIT"><code class="name">var <span class="ident">MESSAGE_FUNCTION_INIT</span></code></dt>
+<dd>
+<div class="desc"><p>The type of the None singleton.</p></div>
+</dd>
+<dt id="importer.MessagesMeta.MESSAGE_FUNCTION_PROGRESS"><code class="name">var <span class="ident">MESSAGE_FUNCTION_PROGRESS</span></code></dt>
+<dd>
+<div class="desc"><p>The type of the None singleton.</p></div>
+</dd>
+<dt id="importer.MessagesMeta.MESSAGE_INFO"><code class="name">var <span class="ident">MESSAGE_INFO</span></code></dt>
+<dd>
+<div class="desc"><p>The type of the None singleton.</p></div>
+</dd>
+</dl>
+</dd>
+<dt id="importer.ParseKeywords"><code class="flex name class">
+<span>class <span class="ident">ParseKeywords</span></span>
+<span>(</span><span>*args, **kwds)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>A silly enum used mostly to refer the format the images will have once the common files are created</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>enum.StrEnum</li>
+<li>builtins.str</li>
+<li>enum.ReprEnum</li>
+<li>enum.Enum</li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="importer.ParseKeywords.FILE"><code class="name">var <span class="ident">FILE</span></code></dt>
+<dd>
+<div class="desc"><p>indicate to use file-like format</p></div>
+</dd>
+<dt id="importer.ParseKeywords.FOLDER"><code class="name">var <span class="ident">FOLDER</span></code></dt>
+<dd>
+<div class="desc"><p>indicate to use folder-like format</p></div>
+</dd>
+</dl>
+</dd>
+<dt id="importer.ProccesKeywords"><code class="flex name class">
+<span>class <span class="ident">ProccesKeywords</span></span>
+<span>(</span><span>*args, **kwds)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>A silly enum that saves a flag-like system (not the best ofc) that determines how <code><a title="importer.write_common_file" href="#importer.write_common_file">write_common_file()</a></code> and other functions behave</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>enum.StrEnum</li>
+<li>builtins.str</li>
+<li>enum.ReprEnum</li>
+<li>enum.Enum</li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="importer.ProccesKeywords.ALL"><code class="name">var <span class="ident">ALL</span></code></dt>
+<dd>
+<div class="desc"><p>indicate to use everything</p></div>
+</dd>
+<dt id="importer.ProccesKeywords.ANIMATED"><code class="name">var <span class="ident">ANIMATED</span></code></dt>
+<dd>
+<div class="desc"><p>indicate to use animated-like format, and this will actually check if the file is available for that porpuse, see <code><a title="importer.KEYS_IMPORTED" href="#importer.KEYS_IMPORTED">KEYS_IMPORTED</a></code> or <code><a title="importer.BUILDIN_ANIMATION_KEYS" href="#importer.BUILDIN_ANIMATION_KEYS">BUILDIN_ANIMATION_KEYS</a></code> for more info</p></div>
+</dd>
+<dt id="importer.ProccesKeywords.FLIP"><code class="name">var <span class="ident">FLIP</span></code></dt>
+<dd>
+<div class="desc"><p>indicate to use flip-like format</p></div>
+</dd>
+<dt id="importer.ProccesKeywords.IGNORE"><code class="name">var <span class="ident">IGNORE</span></code></dt>
+<dd>
+<div class="desc"><p>indicate to ignore certain internal-level checks when used</p></div>
+</dd>
+<dt id="importer.ProccesKeywords.NOTHING"><code class="name">var <span class="ident">NOTHING</span></code></dt>
+<dd>
+<div class="desc"><p>indicate to ignore certain low-level checks when used</p></div>
+</dd>
+<dt id="importer.ProccesKeywords.SCALE"><code class="name">var <span class="ident">SCALE</span></code></dt>
+<dd>
+<div class="desc"><p>indicate to use scale-like format</p></div>
+</dd>
+<dt id="importer.ProccesKeywords.SIDE"><code class="name">var <span class="ident">SIDE</span></code></dt>
+<dd>
+<div class="desc"><p>indicate to use side-like format (this doesn't check if the file actually exits...........)</p></div>
+</dd>
+<dt id="importer.ProccesKeywords.SUBFOLDER"><code class="name">var <span class="ident">SUBFOLDER</span></code></dt>
+<dd>
+<div class="desc"><p>indicate to also add subfolders to the procces</p></div>
+</dd>
+</dl>
+</dd>
+<dt id="importer.RequiredFiles"><code class="flex name class">
+<span>class <span class="ident">RequiredFiles</span></span>
+<span>(</span><span>*args, **kwds)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>A silly enum that save some required file names (mostly optional)</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>enum.StrEnum</li>
+<li>builtins.str</li>
+<li>enum.ReprEnum</li>
+<li>enum.Enum</li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="importer.RequiredFiles.ANIMATED"><code class="name">var <span class="ident">ANIMATED</span></code></dt>
+<dd>
+<div class="desc"><p>Here the keyword within the words are saved, mostly they are saved to differeciate single image with animated ones, see <code><a title="importer.BUILDIN_ANIMATION_KEYS" href="#importer.BUILDIN_ANIMATION_KEYS">BUILDIN_ANIMATION_KEYS</a></code> for a better
+how-to guide</p></div>
+</dd>
+<dt id="importer.RequiredFiles.INFO"><code class="name">var <span class="ident">INFO</span></code></dt>
+<dd>
+<div class="desc"><p>Here part of the tool's behavior starts, what is described in <code><a title="importer.ImageConfigHead" href="#importer.ImageConfigHead">ImageConfigHead</a></code> and <code><a title="importer.ImageConfigValue" href="#importer.ImageConfigValue">ImageConfigValue</a></code> are saved and evaluated
+in runtime, for more info, check their respective section</p></div>
+</dd>
+<dt id="importer.RequiredFiles.TEMPLATES"><code class="name">var <span class="ident">TEMPLATES</span></code></dt>
+<dd>
+<div class="desc"><p>Here the textual templates are saved, you might use <code><a title="importer.TemplateKeys" href="#importer.TemplateKeys">TemplateKeys</a></code> or custome ones, but using the tool with commands, only
+those that actually exits in <code><a title="importer.TemplateKeys" href="#importer.TemplateKeys">TemplateKeys</a></code> are supported, and the template is kinda limited, check <code><a title="importer.BUILDIN_TEMPLATES" href="#importer.BUILDIN_TEMPLATES">BUILDIN_TEMPLATES</a></code> for more info</p></div>
+</dd>
+</dl>
+</dd>
+<dt id="importer.SearchEngine"><code class="flex name class">
+<span>class <span class="ident">SearchEngine</span></span>
+<span>(</span><span>sc: whoosh.fields.Schema)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>light weigth search based on whoosh</p></div>
+<h3>Methods</h3>
+<dl>
+<dt id="importer.SearchEngine.get_index_size"><code class="name flex">
+<span>def <span class="ident">get_index_size</span></span>(<span>self) ‑> int</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Get all docs indexed so far</p>
+<h2 id="returns">Returns</h2>
+<p>repr (int): lenght of docs indexed</p></div>
+</dd>
+<dt id="importer.SearchEngine.index_documents"><code class="name flex">
+<span>def <span class="ident">index_documents</span></span>(<span>self, docs: Sequence)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Index some documents to RAM</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>docs</code></strong> :&ensp;<code>Sequence</code></dt>
+<dd>docs</dd>
+</dl></div>
+</dd>
+<dt id="importer.SearchEngine.query"><code class="name flex">
+<span>def <span class="ident">query</span></span>(<span>self, q: str, fields: Sequence, highlight: bool = True) ‑> list[dict]</span>
+</code></dt>
+<dd>
+<div class="desc"><p>Search trought all indexed docs</p>
+<h2 id="args">Args</h2>
+<dl>
+<dt><strong><code>q</code></strong> :&ensp;<code>str</code></dt>
+<dd>name to search for</dd>
+<dt><strong><code>fields</code></strong> :&ensp;<code>Sequence</code></dt>
+<dd>fields to search for</dd>
+<dt><strong><code>highlight</code></strong> :&ensp;<code>bool</code>, optional</dt>
+<dd>highlight where the match is. Defaults to True.</dd>
+</dl>
+<h2 id="returns">Returns</h2>
+<p>repr (List[Dict]): all coincidences</p></div>
+</dd>
+</dl>
+</dd>
+<dt id="importer.TemplateKeys"><code class="flex name class">
+<span>class <span class="ident">TemplateKeys</span></span>
+<span>(</span><span>*args, **kwds)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>A silly collection of formats that are currectly supported, mostly this is just a reference, the real ones might be present in
+<code><a title="importer.FORMATS_IMPORTED" href="#importer.FORMATS_IMPORTED">FORMATS_IMPORTED</a></code>, but these ones can be used in the correct areas (like <code><a title="importer.mkr_lines_list" href="#importer.mkr_lines_list">mkr_lines_list()</a></code> to make exceptions to the rule, but that's not
+recommended anyway)</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>enum.StrEnum</li>
+<li>builtins.str</li>
+<li>enum.ReprEnum</li>
+<li>enum.Enum</li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="importer.TemplateKeys.ANIMATED_ANIMATED_BODY"><code class="name">var <span class="ident">ANIMATED_ANIMATED_BODY</span></code></dt>
+<dd>
+<div class="desc"><p>indicate to use the 'animated_animated_body' template</p></div>
+</dd>
+<dt id="importer.TemplateKeys.ANIMATED_BLINK_NORMAL"><code class="name">var <span class="ident">ANIMATED_BLINK_NORMAL</span></code></dt>
+<dd>
+<div class="desc"><p>indicate to use the 'animated_blink_normal' template</p></div>
+</dd>
+<dt id="importer.TemplateKeys.FLIPED"><code class="name">var <span class="ident">FLIPED</span></code></dt>
+<dd>
+<div class="desc"><p>indicate to use the 'fliped' template</p></div>
+</dd>
+<dt id="importer.TemplateKeys.NORMAL"><code class="name">var <span class="ident">NORMAL</span></code></dt>
+<dd>
+<div class="desc"><p>indicate to use the 'normal' template</p></div>
+</dd>
+<dt id="importer.TemplateKeys.SCALE"><code class="name">var <span class="ident">SCALE</span></code></dt>
+<dd>
+<div class="desc"><p>indicate to use the 'scale' template</p></div>
+</dd>
+<dt id="importer.TemplateKeys.SIDE"><code class="name">var <span class="ident">SIDE</span></code></dt>
+<dd>
+<div class="desc"><p>indicate to use the 'side' template</p></div>
+</dd>
+<dt id="importer.TemplateKeys.SOUND"><code class="name">var <span class="ident">SOUND</span></code></dt>
+<dd>
+<div class="desc"><p>indicate to use the 'sound' template</p></div>
+</dd>
+<dt id="importer.TemplateKeys.VIDEO"><code class="name">var <span class="ident">VIDEO</span></code></dt>
+<dd>
+<div class="desc"><p>indicate to use the 'video' template</p></div>
+</dd>
+<dt id="importer.TemplateKeys.ZIPLOAD"><code class="name">var <span class="ident">ZIPLOAD</span></code></dt>
+<dd>
+<div class="desc"><p>indicate to use the 'zipload' template</p></div>
+</dd>
+</dl>
+</dd>
+<dt id="importer.TemplatePath"><code class="flex name class">
+<span>class <span class="ident">TemplatePath</span></span>
+<span>(</span><span>*args, **kwds)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>A silly enum that saves how the path is expressed and imported by <code><a title="importer.get_name_template" href="#importer.get_name_template">get_name_template()</a></code></p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>enum.StrEnum</li>
+<li>builtins.str</li>
+<li>enum.ReprEnum</li>
+<li>enum.Enum</li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="importer.TemplatePath.ENCRYPT"><code class="name">var <span class="ident">ENCRYPT</span></code></dt>
+<dd>
+<div class="desc"><p>indicate to use the encrypt import</p></div>
+</dd>
+<dt id="importer.TemplatePath.NORMAL"><code class="name">var <span class="ident">NORMAL</span></code></dt>
+<dd>
+<div class="desc"><p>indicate to use the normal import</p></div>
+</dd>
+<dt id="importer.TemplatePath.ZIP"><code class="name">var <span class="ident">ZIP</span></code></dt>
+<dd>
+<div class="desc"><p>indicate to use the zip import</p></div>
+</dd>
+</dl>
+</dd>
+<dt id="importer.TemplatePathKeys"><code class="flex name class">
+<span>class <span class="ident">TemplatePathKeys</span></span>
+<span>(</span><span>*args, **kwds)</span>
+</code></dt>
+<dd>
+<div class="desc"><p>A really&hellip; reallly&hellip; REALLY silly enum that doesn't really do much.... just is being used by <code><a title="importer.write_side_image" href="#importer.write_side_image">write_side_image()</a></code> cuz someone didn't want to use functional arguments (?)</p></div>
+<h3>Ancestors</h3>
+<ul class="hlist">
+<li>enum.StrEnum</li>
+<li>builtins.str</li>
+<li>enum.ReprEnum</li>
+<li>enum.Enum</li>
+</ul>
+<h3>Class variables</h3>
+<dl>
+<dt id="importer.TemplatePathKeys.BASE"><code class="name">var <span class="ident">BASE</span></code></dt>
+<dd>
+<div class="desc"><p>Base path (this should include everything, in windows C:/User/[name]/etc/etc/etc)</p></div>
+</dd>
+<dt id="importer.TemplatePathKeys.NAME"><code class="name">var <span class="ident">NAME</span></code></dt>
+<dd>
+<div class="desc"><p>Base name, mostly what is at the end of <code><a title="importer.TemplatePathKeys.BASE" href="#importer.TemplatePathKeys.BASE">TemplatePathKeys.BASE</a></code> path</p></div>
+</dd>
+</dl>
+</dd>
+</dl>
+</section>
+</article>
+<nav id="sidebar">
+<div class="toc">
+<ul>
+<li><a href="#how-to-use-easy-tutorial">How to use (easy tutorial)</a><ul>
+<li><a href="#setup">Setup</a></li>
+<li><a href="#basic-commands">Basic commands</a></li>
+</ul>
+</li>
+<li><a href="#details">Details</a></li>
+<li><a href="#depencencies">Depencencies</a></li>
+<li><a href="#naming">Naming</a><ul>
+<li><a href="#get-functions">GET Functions</a></li>
+<li><a href="#mkr-functions">MKR Functions</a></li>
+<li><a href="#functions-adddelrmsaveload">Functions ADD/DEL/RM/SAVE/LOAD</a></li>
+<li><a href="#import-functions">IMPORT Functions</a></li>
+<li><a href="#scan-functions">SCAN Functions</a></li>
+<li><a href="#write-functions">WRITE Functions</a></li>
+<li><a href="#other-functions">Other Functions</a></li>
+</ul>
+</li>
+<li><a href="#folder-structure">Folder structure</a></li>
+<li><a href="#commands">Commands</a><ul>
+<li><a href="#cases">Cases</a></li>
+</ul>
+</li>
+<li><a href="#error-codes">Error codes</a></li>
+<li><a href="#changelog">Changelog</a><ul>
+<li><a href="#17022025">17/02/2025</a></li>
+<li><a href="#10032025">10/03/2025</a></li>
+<li><a href="#05122025">05/12/2025</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<ul id="index">
+<li><h3><a href="#header-variables">Global variables</a></h3>
+<ul class="">
+<li><code><a title="importer.BUILDIN_ANIMATION_KEYS" href="#importer.BUILDIN_ANIMATION_KEYS">BUILDIN_ANIMATION_KEYS</a></code></li>
+<li><code><a title="importer.BUILDIN_FILE_TEMPLATES" href="#importer.BUILDIN_FILE_TEMPLATES">BUILDIN_FILE_TEMPLATES</a></code></li>
+<li><code><a title="importer.BUILDIN_TEMPLATES" href="#importer.BUILDIN_TEMPLATES">BUILDIN_TEMPLATES</a></code></li>
+<li><code><a title="importer.DEFAULT_EXTEND_IMAGE_NOT_SUPPORT" href="#importer.DEFAULT_EXTEND_IMAGE_NOT_SUPPORT">DEFAULT_EXTEND_IMAGE_NOT_SUPPORT</a></code></li>
+<li><code><a title="importer.DEFAULT_EXTEND_IMAGE_SUPPORT" href="#importer.DEFAULT_EXTEND_IMAGE_SUPPORT">DEFAULT_EXTEND_IMAGE_SUPPORT</a></code></li>
+<li><code><a title="importer.DEFAULT_EXTEND_SOUND_NOT_SUPPORT" href="#importer.DEFAULT_EXTEND_SOUND_NOT_SUPPORT">DEFAULT_EXTEND_SOUND_NOT_SUPPORT</a></code></li>
+<li><code><a title="importer.DEFAULT_EXTEND_SOUND_SUPPORT" href="#importer.DEFAULT_EXTEND_SOUND_SUPPORT">DEFAULT_EXTEND_SOUND_SUPPORT</a></code></li>
+<li><code><a title="importer.DEFAULT_EXTEND_VIDEO_NOT_SUPPORT" href="#importer.DEFAULT_EXTEND_VIDEO_NOT_SUPPORT">DEFAULT_EXTEND_VIDEO_NOT_SUPPORT</a></code></li>
+<li><code><a title="importer.DEFAULT_EXTEND_VIDEO_SUPPORT" href="#importer.DEFAULT_EXTEND_VIDEO_SUPPORT">DEFAULT_EXTEND_VIDEO_SUPPORT</a></code></li>
+<li><code><a title="importer.DEFAULT_KIND_IMPORT" href="#importer.DEFAULT_KIND_IMPORT">DEFAULT_KIND_IMPORT</a></code></li>
+<li><code><a title="importer.DEFAULT_NAME_LIMIT" href="#importer.DEFAULT_NAME_LIMIT">DEFAULT_NAME_LIMIT</a></code></li>
+<li><code><a title="importer.DEFAULT_PATH_IMAGE" href="#importer.DEFAULT_PATH_IMAGE">DEFAULT_PATH_IMAGE</a></code></li>
+<li><code><a title="importer.DEFAULT_PATH_SIDE" href="#importer.DEFAULT_PATH_SIDE">DEFAULT_PATH_SIDE</a></code></li>
+<li><code><a title="importer.DEFAULT_PATH_SOUND" href="#importer.DEFAULT_PATH_SOUND">DEFAULT_PATH_SOUND</a></code></li>
+<li><code><a title="importer.DEFAULT_PATH_VIDEO" href="#importer.DEFAULT_PATH_VIDEO">DEFAULT_PATH_VIDEO</a></code></li>
+<li><code><a title="importer.DEFAULT_RESOURCE_PATH" href="#importer.DEFAULT_RESOURCE_PATH">DEFAULT_RESOURCE_PATH</a></code></li>
+<li><code><a title="importer.DEFAULT_SIZE_CORP_VAR" href="#importer.DEFAULT_SIZE_CORP_VAR">DEFAULT_SIZE_CORP_VAR</a></code></li>
+<li><code><a title="importer.DEFAULT_SIZE_SCREEN" href="#importer.DEFAULT_SIZE_SCREEN">DEFAULT_SIZE_SCREEN</a></code></li>
+<li><code><a title="importer.DEFAULT_SIZE_SIDE_VAR" href="#importer.DEFAULT_SIZE_SIDE_VAR">DEFAULT_SIZE_SIDE_VAR</a></code></li>
+<li><code><a title="importer.DEFAULT_TAB" href="#importer.DEFAULT_TAB">DEFAULT_TAB</a></code></li>
+<li><code><a title="importer.FILE_NAME_REPLACE" href="#importer.FILE_NAME_REPLACE">FILE_NAME_REPLACE</a></code></li>
+<li><code><a title="importer.FILE_NAME_REPLACE_LONG" href="#importer.FILE_NAME_REPLACE_LONG">FILE_NAME_REPLACE_LONG</a></code></li>
+<li><code><a title="importer.FORMAT" href="#importer.FORMAT">FORMAT</a></code></li>
+<li><code><a title="importer.FORMATS_IMPORTED" href="#importer.FORMATS_IMPORTED">FORMATS_IMPORTED</a></code></li>
+<li><code><a title="importer.IGNORE_NOT_SUPPORTED" href="#importer.IGNORE_NOT_SUPPORTED">IGNORE_NOT_SUPPORTED</a></code></li>
+<li><code><a title="importer.IMAGE_KEYWORDS" href="#importer.IMAGE_KEYWORDS">IMAGE_KEYWORDS</a></code></li>
+<li><code><a title="importer.KEYS_IMPORTED" href="#importer.KEYS_IMPORTED">KEYS_IMPORTED</a></code></li>
+<li><code><a title="importer.RESERVED_GENERIC_CREA_EXTEN" href="#importer.RESERVED_GENERIC_CREA_EXTEN">RESERVED_GENERIC_CREA_EXTEN</a></code></li>
+<li><code><a title="importer.RESERVED_GENERIC_CREA_NAMES" href="#importer.RESERVED_GENERIC_CREA_NAMES">RESERVED_GENERIC_CREA_NAMES</a></code></li>
+<li><code><a title="importer.RESERVED_GENERIC_FILE_EXTEN" href="#importer.RESERVED_GENERIC_FILE_EXTEN">RESERVED_GENERIC_FILE_EXTEN</a></code></li>
+<li><code><a title="importer.RESERVED_GENERIC_FILE_NAMES" href="#importer.RESERVED_GENERIC_FILE_NAMES">RESERVED_GENERIC_FILE_NAMES</a></code></li>
+<li><code><a title="importer.RESERVED_GENERIC_FOLD_NAMES" href="#importer.RESERVED_GENERIC_FOLD_NAMES">RESERVED_GENERIC_FOLD_NAMES</a></code></li>
+<li><code><a title="importer.ROOT_EXE_GAME" href="#importer.ROOT_EXE_GAME">ROOT_EXE_GAME</a></code></li>
+<li><code><a title="importer.ROOT_RES_SOFT" href="#importer.ROOT_RES_SOFT">ROOT_RES_SOFT</a></code></li>
+<li><code><a title="importer.SKIP_EXTENSION" href="#importer.SKIP_EXTENSION">SKIP_EXTENSION</a></code></li>
+<li><code><a title="importer.SKIP_FILE_NAME" href="#importer.SKIP_FILE_NAME">SKIP_FILE_NAME</a></code></li>
+<li><code><a title="importer.SKIP_FOL_NAMES" href="#importer.SKIP_FOL_NAMES">SKIP_FOL_NAMES</a></code></li>
+<li><code><a title="importer.SKIP_GEN_NAMES" href="#importer.SKIP_GEN_NAMES">SKIP_GEN_NAMES</a></code></li>
+<li><code><a title="importer.SKIP_SYMBOLS" href="#importer.SKIP_SYMBOLS">SKIP_SYMBOLS</a></code></li>
+<li><code><a title="importer.SOUND_KEYWORDS" href="#importer.SOUND_KEYWORDS">SOUND_KEYWORDS</a></code></li>
+<li><code><a title="importer.features_available" href="#importer.features_available">features_available</a></code></li>
+<li><code><a title="importer.features_enabled" href="#importer.features_enabled">features_enabled</a></code></li>
+<li><code><a title="importer.language" href="#importer.language">language</a></code></li>
+<li><code><a title="importer.languages" href="#importer.languages">languages</a></code></li>
+<li><code><a title="importer.logger" href="#importer.logger">logger</a></code></li>
+<li><code><a title="importer.os_language" href="#importer.os_language">os_language</a></code></li>
+<li><code><a title="importer.parser" href="#importer.parser">parser</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-functions">Functions</a></h3>
+<ul class="">
+<li><code><a title="importer.add_feature" href="#importer.add_feature">add_feature</a></code></li>
+<li><code><a title="importer.add_jump" href="#importer.add_jump">add_jump</a></code></li>
+<li><code><a title="importer.del_jump" href="#importer.del_jump">del_jump</a></code></li>
+<li><code><a title="importer.frame" href="#importer.frame">frame</a></code></li>
+<li><code><a title="importer.get_list_file_extended" href="#importer.get_list_file_extended">get_list_file_extended</a></code></li>
+<li><code><a title="importer.get_list_file_named" href="#importer.get_list_file_named">get_list_file_named</a></code></li>
+<li><code><a title="importer.get_list_files" href="#importer.get_list_files">get_list_files</a></code></li>
+<li><code><a title="importer.get_list_namesimple" href="#importer.get_list_namesimple">get_list_namesimple</a></code></li>
+<li><code><a title="importer.get_list_subfolders" href="#importer.get_list_subfolders">get_list_subfolders</a></code></li>
+<li><code><a title="importer.get_list_system_dirs" href="#importer.get_list_system_dirs">get_list_system_dirs</a></code></li>
+<li><code><a title="importer.get_list_system_file" href="#importer.get_list_system_file">get_list_system_file</a></code></li>
+<li><code><a title="importer.get_message_translated" href="#importer.get_message_translated">get_message_translated</a></code></li>
+<li><code><a title="importer.get_name_acron" href="#importer.get_name_acron">get_name_acron</a></code></li>
+<li><code><a title="importer.get_name_parsed" href="#importer.get_name_parsed">get_name_parsed</a></code></li>
+<li><code><a title="importer.get_name_template" href="#importer.get_name_template">get_name_template</a></code></li>
+<li><code><a title="importer.get_path_parsed" href="#importer.get_path_parsed">get_path_parsed</a></code></li>
+<li><code><a title="importer.given_path" href="#importer.given_path">given_path</a></code></li>
+<li><code><a title="importer.handler" href="#importer.handler">handler</a></code></li>
+<li><code><a title="importer.has_feature" href="#importer.has_feature">has_feature</a></code></li>
+<li><code><a title="importer.has_required_keys" href="#importer.has_required_keys">has_required_keys</a></code></li>
+<li><code><a title="importer.import_audio" href="#importer.import_audio">import_audio</a></code></li>
+<li><code><a title="importer.import_backgrounds" href="#importer.import_backgrounds">import_backgrounds</a></code></li>
+<li><code><a title="importer.import_sprites" href="#importer.import_sprites">import_sprites</a></code></li>
+<li><code><a title="importer.import_video" href="#importer.import_video">import_video</a></code></li>
+<li><code><a title="importer.is_animated_name" href="#importer.is_animated_name">is_animated_name</a></code></li>
+<li><code><a title="importer.is_reserved" href="#importer.is_reserved">is_reserved</a></code></li>
+<li><code><a title="importer.mkr_dir" href="#importer.mkr_dir">mkr_dir</a></code></li>
+<li><code><a title="importer.mkr_lines_list" href="#importer.mkr_lines_list">mkr_lines_list</a></code></li>
+<li><code><a title="importer.mkr_str" href="#importer.mkr_str">mkr_str</a></code></li>
+<li><code><a title="importer.rm_defaults" href="#importer.rm_defaults">rm_defaults</a></code></li>
+<li><code><a title="importer.scan_file_compressed" href="#importer.scan_file_compressed">scan_file_compressed</a></code></li>
+<li><code><a title="importer.scan_folder_for" href="#importer.scan_folder_for">scan_folder_for</a></code></li>
+<li><code><a title="importer.scan_lines_chapters" href="#importer.scan_lines_chapters">scan_lines_chapters</a></code></li>
+<li><code><a title="importer.scan_lines_common" href="#importer.scan_lines_common">scan_lines_common</a></code></li>
+<li><code><a title="importer.scan_subfolder_do" href="#importer.scan_subfolder_do">scan_subfolder_do</a></code></li>
+<li><code><a title="importer.write_chipher_images" href="#importer.write_chipher_images">write_chipher_images</a></code></li>
+<li><code><a title="importer.write_common_file" href="#importer.write_common_file">write_common_file</a></code></li>
+<li><code><a title="importer.write_names" href="#importer.write_names">write_names</a></code></li>
+<li><code><a title="importer.write_side_image" href="#importer.write_side_image">write_side_image</a></code></li>
+</ul>
+</li>
+<li><h3><a href="#header-classes">Classes</a></h3>
+<ul>
+<li>
+<h4><code><a title="importer.ArgumentsGiven" href="#importer.ArgumentsGiven">ArgumentsGiven</a></code></h4>
+<ul class="two-column">
+<li><code><a title="importer.ArgumentsGiven.audio" href="#importer.ArgumentsGiven.audio">audio</a></code></li>
+<li><code><a title="importer.ArgumentsGiven.background" href="#importer.ArgumentsGiven.background">background</a></code></li>
+<li><code><a title="importer.ArgumentsGiven.can_generate_common" href="#importer.ArgumentsGiven.can_generate_common">can_generate_common</a></code></li>
+<li><code><a title="importer.ArgumentsGiven.can_generate_side" href="#importer.ArgumentsGiven.can_generate_side">can_generate_side</a></code></li>
+<li><code><a title="importer.ArgumentsGiven.can_generate_zip" href="#importer.ArgumentsGiven.can_generate_zip">can_generate_zip</a></code></li>
+<li><code><a title="importer.ArgumentsGiven.game" href="#importer.ArgumentsGiven.game">game</a></code></li>
+<li><code><a title="importer.ArgumentsGiven.sprite" href="#importer.ArgumentsGiven.sprite">sprite</a></code></li>
+<li><code><a title="importer.ArgumentsGiven.use_cipher_zone" href="#importer.ArgumentsGiven.use_cipher_zone">use_cipher_zone</a></code></li>
+<li><code><a title="importer.ArgumentsGiven.use_renamer" href="#importer.ArgumentsGiven.use_renamer">use_renamer</a></code></li>
+<li><code><a title="importer.ArgumentsGiven.video" href="#importer.ArgumentsGiven.video">video</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="importer.ColorPerLevel" href="#importer.ColorPerLevel">ColorPerLevel</a></code></h4>
+<ul class="">
+<li><code><a title="importer.ColorPerLevel.CRITIC" href="#importer.ColorPerLevel.CRITIC">CRITIC</a></code></li>
+<li><code><a title="importer.ColorPerLevel.GENERIC" href="#importer.ColorPerLevel.GENERIC">GENERIC</a></code></li>
+<li><code><a title="importer.ColorPerLevel.INTERNAL" href="#importer.ColorPerLevel.INTERNAL">INTERNAL</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="importer.FeaturesKeywords" href="#importer.FeaturesKeywords">FeaturesKeywords</a></code></h4>
+<ul class="">
+<li><code><a title="importer.FeaturesKeywords.IMAGE_CREATION" href="#importer.FeaturesKeywords.IMAGE_CREATION">IMAGE_CREATION</a></code></li>
+<li><code><a title="importer.FeaturesKeywords.PRETTY_CONSOLE" href="#importer.FeaturesKeywords.PRETTY_CONSOLE">PRETTY_CONSOLE</a></code></li>
+<li><code><a title="importer.FeaturesKeywords.RENAMING_PROCESS" href="#importer.FeaturesKeywords.RENAMING_PROCESS">RENAMING_PROCESS</a></code></li>
+<li><code><a title="importer.FeaturesKeywords.SIDE_GENERATION" href="#importer.FeaturesKeywords.SIDE_GENERATION">SIDE_GENERATION</a></code></li>
+<li><code><a title="importer.FeaturesKeywords.ZIP_COMPRESSION" href="#importer.FeaturesKeywords.ZIP_COMPRESSION">ZIP_COMPRESSION</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="importer.ImageConfigHead" href="#importer.ImageConfigHead">ImageConfigHead</a></code></h4>
+<ul class="">
+<li><code><a title="importer.ImageConfigHead.SCALE" href="#importer.ImageConfigHead.SCALE">SCALE</a></code></li>
+<li><code><a title="importer.ImageConfigHead.SIDE" href="#importer.ImageConfigHead.SIDE">SIDE</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="importer.ImageConfigValue" href="#importer.ImageConfigValue">ImageConfigValue</a></code></h4>
+<ul class="">
+<li><code><a title="importer.ImageConfigValue.DIMENSION" href="#importer.ImageConfigValue.DIMENSION">DIMENSION</a></code></li>
+<li><code><a title="importer.ImageConfigValue.KEYS" href="#importer.ImageConfigValue.KEYS">KEYS</a></code></li>
+<li><code><a title="importer.ImageConfigValue.REPEAT" href="#importer.ImageConfigValue.REPEAT">REPEAT</a></code></li>
+<li><code><a title="importer.ImageConfigValue.SIZE" href="#importer.ImageConfigValue.SIZE">SIZE</a></code></li>
+<li><code><a title="importer.ImageConfigValue.SQUARE" href="#importer.ImageConfigValue.SQUARE">SQUARE</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="importer.ImportKeywords" href="#importer.ImportKeywords">ImportKeywords</a></code></h4>
+<ul class="">
+<li><code><a title="importer.ImportKeywords.IMAGES" href="#importer.ImportKeywords.IMAGES">IMAGES</a></code></li>
+<li><code><a title="importer.ImportKeywords.SOUNDS" href="#importer.ImportKeywords.SOUNDS">SOUNDS</a></code></li>
+<li><code><a title="importer.ImportKeywords.VIDEOS" href="#importer.ImportKeywords.VIDEOS">VIDEOS</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="importer.MessagesError" href="#importer.MessagesError">MessagesError</a></code></h4>
+<ul class="">
+<li><code><a title="importer.MessagesError.ARGUMENT_NOT_FOUND" href="#importer.MessagesError.ARGUMENT_NOT_FOUND">ARGUMENT_NOT_FOUND</a></code></li>
+<li><code><a title="importer.MessagesError.EXTENSION_ERROR" href="#importer.MessagesError.EXTENSION_ERROR">EXTENSION_ERROR</a></code></li>
+<li><code><a title="importer.MessagesError.FEATURE_NOT_SUPPORTED" href="#importer.MessagesError.FEATURE_NOT_SUPPORTED">FEATURE_NOT_SUPPORTED</a></code></li>
+<li><code><a title="importer.MessagesError.FEAUTRE_NOT_FOUND" href="#importer.MessagesError.FEAUTRE_NOT_FOUND">FEAUTRE_NOT_FOUND</a></code></li>
+<li><code><a title="importer.MessagesError.FILE_NOT_FOUND" href="#importer.MessagesError.FILE_NOT_FOUND">FILE_NOT_FOUND</a></code></li>
+<li><code><a title="importer.MessagesError.INCORRECT_ARGUMENTS" href="#importer.MessagesError.INCORRECT_ARGUMENTS">INCORRECT_ARGUMENTS</a></code></li>
+<li><code><a title="importer.MessagesError.MODULE_NOT_FOUND" href="#importer.MessagesError.MODULE_NOT_FOUND">MODULE_NOT_FOUND</a></code></li>
+<li><code><a title="importer.MessagesError.MODULE_NOT_FOUND_USING_DEFAULT" href="#importer.MessagesError.MODULE_NOT_FOUND_USING_DEFAULT">MODULE_NOT_FOUND_USING_DEFAULT</a></code></li>
+<li><code><a title="importer.MessagesError.PATH_NOT_FOUND" href="#importer.MessagesError.PATH_NOT_FOUND">PATH_NOT_FOUND</a></code></li>
+<li><code><a title="importer.MessagesError.USING_BUILT_IN" href="#importer.MessagesError.USING_BUILT_IN">USING_BUILT_IN</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="importer.MessagesMeta" href="#importer.MessagesMeta">MessagesMeta</a></code></h4>
+<ul class="">
+<li><code><a title="importer.MessagesMeta.DESCRIPTION" href="#importer.MessagesMeta.DESCRIPTION">DESCRIPTION</a></code></li>
+<li><code><a title="importer.MessagesMeta.MESSAGE_FUNCTION_ENDED" href="#importer.MessagesMeta.MESSAGE_FUNCTION_ENDED">MESSAGE_FUNCTION_ENDED</a></code></li>
+<li><code><a title="importer.MessagesMeta.MESSAGE_FUNCTION_INIT" href="#importer.MessagesMeta.MESSAGE_FUNCTION_INIT">MESSAGE_FUNCTION_INIT</a></code></li>
+<li><code><a title="importer.MessagesMeta.MESSAGE_FUNCTION_PROGRESS" href="#importer.MessagesMeta.MESSAGE_FUNCTION_PROGRESS">MESSAGE_FUNCTION_PROGRESS</a></code></li>
+<li><code><a title="importer.MessagesMeta.MESSAGE_INFO" href="#importer.MessagesMeta.MESSAGE_INFO">MESSAGE_INFO</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="importer.ParseKeywords" href="#importer.ParseKeywords">ParseKeywords</a></code></h4>
+<ul class="">
+<li><code><a title="importer.ParseKeywords.FILE" href="#importer.ParseKeywords.FILE">FILE</a></code></li>
+<li><code><a title="importer.ParseKeywords.FOLDER" href="#importer.ParseKeywords.FOLDER">FOLDER</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="importer.ProccesKeywords" href="#importer.ProccesKeywords">ProccesKeywords</a></code></h4>
+<ul class="two-column">
+<li><code><a title="importer.ProccesKeywords.ALL" href="#importer.ProccesKeywords.ALL">ALL</a></code></li>
+<li><code><a title="importer.ProccesKeywords.ANIMATED" href="#importer.ProccesKeywords.ANIMATED">ANIMATED</a></code></li>
+<li><code><a title="importer.ProccesKeywords.FLIP" href="#importer.ProccesKeywords.FLIP">FLIP</a></code></li>
+<li><code><a title="importer.ProccesKeywords.IGNORE" href="#importer.ProccesKeywords.IGNORE">IGNORE</a></code></li>
+<li><code><a title="importer.ProccesKeywords.NOTHING" href="#importer.ProccesKeywords.NOTHING">NOTHING</a></code></li>
+<li><code><a title="importer.ProccesKeywords.SCALE" href="#importer.ProccesKeywords.SCALE">SCALE</a></code></li>
+<li><code><a title="importer.ProccesKeywords.SIDE" href="#importer.ProccesKeywords.SIDE">SIDE</a></code></li>
+<li><code><a title="importer.ProccesKeywords.SUBFOLDER" href="#importer.ProccesKeywords.SUBFOLDER">SUBFOLDER</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="importer.RequiredFiles" href="#importer.RequiredFiles">RequiredFiles</a></code></h4>
+<ul class="">
+<li><code><a title="importer.RequiredFiles.ANIMATED" href="#importer.RequiredFiles.ANIMATED">ANIMATED</a></code></li>
+<li><code><a title="importer.RequiredFiles.INFO" href="#importer.RequiredFiles.INFO">INFO</a></code></li>
+<li><code><a title="importer.RequiredFiles.TEMPLATES" href="#importer.RequiredFiles.TEMPLATES">TEMPLATES</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="importer.SearchEngine" href="#importer.SearchEngine">SearchEngine</a></code></h4>
+<ul class="">
+<li><code><a title="importer.SearchEngine.get_index_size" href="#importer.SearchEngine.get_index_size">get_index_size</a></code></li>
+<li><code><a title="importer.SearchEngine.index_documents" href="#importer.SearchEngine.index_documents">index_documents</a></code></li>
+<li><code><a title="importer.SearchEngine.query" href="#importer.SearchEngine.query">query</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="importer.TemplateKeys" href="#importer.TemplateKeys">TemplateKeys</a></code></h4>
+<ul class="">
+<li><code><a title="importer.TemplateKeys.ANIMATED_ANIMATED_BODY" href="#importer.TemplateKeys.ANIMATED_ANIMATED_BODY">ANIMATED_ANIMATED_BODY</a></code></li>
+<li><code><a title="importer.TemplateKeys.ANIMATED_BLINK_NORMAL" href="#importer.TemplateKeys.ANIMATED_BLINK_NORMAL">ANIMATED_BLINK_NORMAL</a></code></li>
+<li><code><a title="importer.TemplateKeys.FLIPED" href="#importer.TemplateKeys.FLIPED">FLIPED</a></code></li>
+<li><code><a title="importer.TemplateKeys.NORMAL" href="#importer.TemplateKeys.NORMAL">NORMAL</a></code></li>
+<li><code><a title="importer.TemplateKeys.SCALE" href="#importer.TemplateKeys.SCALE">SCALE</a></code></li>
+<li><code><a title="importer.TemplateKeys.SIDE" href="#importer.TemplateKeys.SIDE">SIDE</a></code></li>
+<li><code><a title="importer.TemplateKeys.SOUND" href="#importer.TemplateKeys.SOUND">SOUND</a></code></li>
+<li><code><a title="importer.TemplateKeys.VIDEO" href="#importer.TemplateKeys.VIDEO">VIDEO</a></code></li>
+<li><code><a title="importer.TemplateKeys.ZIPLOAD" href="#importer.TemplateKeys.ZIPLOAD">ZIPLOAD</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="importer.TemplatePath" href="#importer.TemplatePath">TemplatePath</a></code></h4>
+<ul class="">
+<li><code><a title="importer.TemplatePath.ENCRYPT" href="#importer.TemplatePath.ENCRYPT">ENCRYPT</a></code></li>
+<li><code><a title="importer.TemplatePath.NORMAL" href="#importer.TemplatePath.NORMAL">NORMAL</a></code></li>
+<li><code><a title="importer.TemplatePath.ZIP" href="#importer.TemplatePath.ZIP">ZIP</a></code></li>
+</ul>
+</li>
+<li>
+<h4><code><a title="importer.TemplatePathKeys" href="#importer.TemplatePathKeys">TemplatePathKeys</a></code></h4>
+<ul class="">
+<li><code><a title="importer.TemplatePathKeys.BASE" href="#importer.TemplatePathKeys.BASE">BASE</a></code></li>
+<li><code><a title="importer.TemplatePathKeys.NAME" href="#importer.TemplatePathKeys.NAME">NAME</a></code></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</nav>
+</main>
+<footer id="footer">
+<p>Generated by <a href="https://pdoc3.github.io/pdoc" title="pdoc: Python API documentation generator"><cite>pdoc</cite> 0.11.6</a>.</p>
+</footer>
+</body>
+</html>
